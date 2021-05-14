@@ -1,0 +1,7 @@
+# chuj-elephant-OS
+
+本人对《操作系统真象还原》一书中的操作系统的实现
+
+# finished
+
+## MBR
