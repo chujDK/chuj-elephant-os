@@ -1,0 +1,34 @@
+# configuration file for Bochs
+
+# set the maximum RAM bochs can use
+# key word: megs
+megs: 256
+
+# set the BIOS and VGA BIOS
+# key word: `romimage` and `vgaromimage`
+romimage: file=/home/chuj/.local/share/bochs/BIOS-bochs-latest
+vgaromimage: file=/home/chuj/.local/share/bochs/VGABIOS-lgpl-latest
+
+# set the disk used by bochs
+# key word: floppy
+# floppya => first disk, floppyb => second disk..
+floppya: 1_44=a.img, status=inserted
+
+# select the startup disk
+boot: disk # we don't use floppy at all
+
+# set the log file output
+log: bochs.out
+
+# disable mouse, enable keyboard
+mouse: enabled=0
+keyboard: keymap=/home/chuj/.local/share/bochs/keymaps/x11-pc-us.map
+
+# disk setup
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+ata0-master: type=disk, path="hd60M.img", mode=flat
+
+# add gdb support
+# attach to port 1234
+# however i didn't complie with this
+# gdbstub: enable=1, port=1234, text_base=0, data_base=0, bss_base=0
