@@ -38,7 +38,7 @@ SECTION MBR vstart=0x7C00
     ; ready to call kernel loader
     mov esi,LOADER_START_SECTOR     ; LBA addr of start sector
     mov di,LOADER_BASE_ADDR         ; writing addr
-    mov dx,1                        ; sectors waiting to read
+    mov dx,4                        ; sectors waiting to read
     call MBR_ReadDiskSector_16
     jmp LOADER_BASE_ADDR           ; call loader
 ;---------- end of mbr ----------
