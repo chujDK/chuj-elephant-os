@@ -1,4 +1,5 @@
 .bochs-source/
 disk/bochs.out
+disk/hd60M.img
 
 *.bin
