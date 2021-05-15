@@ -5,3 +5,4 @@
 # finished
 
 [MBR](https://www.cjovi.icu/OS/1320.html)
+GDT setup (just a little)
