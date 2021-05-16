@@ -3,7 +3,10 @@
 section loader vstart=LOADER_BASE_ADDR
 LOADER_STACK_TOP equ LOADER_BASE_ADDR
 
-jmp LoaderStart
+jmp LoaderStart                         ; 3 bytes
+db 0
+dd 0,0,0                                ; addr align
+; offset 0x10
 
 ; set up GOT and descriptor
 GDT_BASE: dd 0x00000000             
@@ -25,6 +28,9 @@ GDT_LIMIT equ GDT_SIZE - 1
 
 times 60 dq 0                           ; reserve 60 GDTs
 
+TOTAL_MEM_BYTES dd 0                    ; memory of the machine
+                                        ; addr: LOADER_BASE_ADDR + 0x10 + 0x200 = 0x800
+
 SELECTOR_CODE equ ((CODE_DESC - GDT_BASE) / 8) << 3 + TI_GDT + RPL0
 SELECTOR_DATA equ ((DATA_STACK_DESC - GDT_BASE) / 8) << 3 + TI_GDT + RPL0
 SELECTOR_VIDEO equ ((VIDEO_DESC - GDT_BASE) / 8) << 3 + TI_GDT + RPL0
@@ -34,17 +40,29 @@ gdt_ptr: dw GDT_LIMIT    ; low 16 bits of GDT reg
          dd GDT_BASE     ; high 32 bits of GDT reg
 ; end of GDT setup
 
-
-loader_msg db '2 loader in real mode.'
-
 LoaderStart:
-mov sp,LOADER_BASE_ADDR
-mov bp,loader_msg
-mov cx,22               ; len
-mov ax,0x1301           ; 0x13: int mode, 0x01: display mode
-mov bx,0x001F           ; page num 0, color: 0x1F
-mov dx,0x1800           ; place to display
-int 0x10                ; call int
+; ---------- first, get the total memory of the machine ----------
+; ---------- we must do it before enter the PE mode as we need the BIOS int ----------
+; use bios int 0x15 sub 0xE801
+.loader_E801FailedRetry:
+mov ax,0xE801
+int 0x15
+jc .loader_E801FailedRetry
+; calculate low 15MB memory
+mov cx,0x400
+mul cx
+shl edx,16
+and eax,0x0000FFFF
+or edx,eax
+add edx,0x100000                        ; add 1MB, this is caused by the memory hole
+mov esi,edx
+
+xor eax,eax
+mov ax,bx
+mov ecx,0x10000                         ; 64 * 1024
+mul ecx
+add esi,eax                             ; esi store the
+mov [TOTAL_MEM_BYTES],esi               ; now TOTAL_MEM_BYTES stores the total memory
 
 ; ---------- ready to enter Proctection mode ----------
 ; 1 open A20 address line
