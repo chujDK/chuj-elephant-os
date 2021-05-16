@@ -80,12 +80,12 @@ MBR_ReadDiskSector_16:
         out dx,al                       ; do read
 
         ; check disk status
-    .MBR_ReadDiskSector_16_DiskNotReady:
+    .ReadDiskSector_16_DiskNotReady:
         in al,dx                        ; get disk status
         and al,0x88                     ; result 0x8 => disk is read 
                                         ; result 0x80 => disk is busy
         cmp al,0x08
-        jnz .MBR_ReadDiskSector_16_DiskNotReady
+        jnz .ReadDiskSector_16_DiskNotReady
 
         ; read data
         mov ax,bx                       ; get n
@@ -93,11 +93,11 @@ MBR_ReadDiskSector_16:
         mul dx                          ; assum this mul won't overflow
         mov cx,ax                       ; sum of words need to read
         mov dx,0x1F0                    ; set reg data
-    .MBR_ReadDiskSector_16_ReadingLoop:
+    .ReadDiskSector_16_ReadingLoop:
         in ax,dx                        ; read a word
         mov [di],ax                     ; write a word
         add di,2
-        loop .MBR_ReadDiskSector_16_ReadingLoop
+        loop .ReadDiskSector_16_ReadingLoop
         ret
 ; end of function MBR_ReadDiskSector_16
 

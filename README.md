@@ -13,3 +13,5 @@
 [MBR](https://www.cjovi.icu/OS/1320.html)
 
 [GDT setup (just a little) and enter Protected Mode](https://www.cjovi.icu/OS/1323.html)
+
+enter Paging mode

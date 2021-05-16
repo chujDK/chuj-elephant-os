@@ -2,6 +2,8 @@
 LOADER_BASE_ADDR equ 0x600                  ; 0x500 ~ 0x7BFF
 LOADER_START_SECTOR equ 0x2
 
+PAGE_DIR_TABLE_POS equ 0x10000              ; PDT start at 1M
+
 ;---------- gdt related ----------
 ; G, D, L, AVL sign
 DESC_G_4K equ 1_00000000000000000000000b    ; set grid 4K
@@ -55,3 +57,10 @@ RPL3 equ 11b                                ; Ring 3
 ; Table Indicator
 TI_GDT equ 000b                                 ; set GDT selector 
 TI_LDT equ 100b                                 ; set LDT selector
+
+; ---------- page related ----------
+PG_P     equ 1                              ; Present sign
+PG_RW_RW equ 10                             ; page type:rw-
+PG_RW_R  equ 00                             ; page type:r--
+PG_US_U  equ 100                            ; User level
+PG_US_S  equ 000                            ; Supervisor level
