@@ -8,7 +8,6 @@ SECTION MBR vstart=0x7C00
     mov ss,ax
     mov fs,ax
     mov sp,0x7C00
-;    mov sp,STACK
     mov ax,0xb800
     mov gs,ax
 
@@ -100,9 +99,6 @@ MBR_ReadDiskSector_16:
         loop .ReadDiskSector_16_ReadingLoop
         ret
 ; end of function MBR_ReadDiskSector_16
-
-;STACK:
-;    times 0x10 dw 0
 
     times 510 - ($ - $$) db 0
     db 0x55,0xaa                        ; magic number
