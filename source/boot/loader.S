@@ -137,11 +137,11 @@ SetupPage:
 
         ; make the PDE[0] and PDE[0xC00] point to the first PTE
         or eax,PG_US_U | PG_RW_RW | PG_P     ; set user page status
-        mov [PAGE_DIR_TABLE_POS + 0x0],eax   ; the first PTE's place
-        mov [PAGE_DIR_TABLE_POS + 0xC00],eax ; the first PTE used by kernel, point ot the fiset PTE
+        mov [PAGE_DIR_TABLE_POS + 0x0],eax   ; the first PTE's place, mapping loader's addr to itself
+        mov [PAGE_DIR_TABLE_POS + 0xC00],eax ; the first PTE used by kernel, mapping to low 1M
         ; 0xC0000000 ~ 0xFFFFFFFF belongs to kernel
         sub eax,0x1000
-        mov [PAGE_DIR_TABLE_POS + 4092],eax  ; make the last Entry point to PDE itself
+        mov [PAGE_DIR_TABLE_POS + 0xFFC],eax  ; make the last Entry point to PDE itself
 
         ; creat PTE for kernel
         mov ecx,256                          ; 1M / 4K = 256
@@ -158,7 +158,7 @@ SetupPage:
         or eax,PG_US_U | PG_RW_RW | PG_P
         mov ebx,PAGE_DIR_TABLE_POS
         mov ecx,254                         ; 1022 - 769 + 1
-        mov eax,769                         ; start from 769,the second PTE of kernel
+        mov esi,769                         ; start from 769,the second PTE of kernel
         .SetupPage_CreateKernelPDE:
             mov [ebx + esi * 4],eax
             inc esi
