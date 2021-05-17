@@ -38,15 +38,15 @@ SECTION MBR vstart=0x7C00
     mov esi,LOADER_START_SECTOR     ; LBA addr of start sector
     mov di,LOADER_BASE_ADDR         ; writing addr
     mov dx,4                        ; sectors waiting to read
-    call MBR_ReadDiskSector_16
+    call ReadDiskSector_16
     jmp LOADER_BASE_ADDR           ; call loader
 ;---------- end of mbr ----------
 
-; function MBR_ReadDiskSector_16(LBA_addr, writing_addr, n), read n sectors from hard-disk in 16 bit mode
+; function ReadDiskSector_16(LBA_addr, writing_addr, n), read n sectors from hard-disk in 16 bit mode
 ; esi: LBA addr of start sector
 ; di: writing addr
 ; dx: n
-MBR_ReadDiskSector_16:
+ReadDiskSector_16:
         ; read sectors
         mov bx,dx                       ; bx keeps the n
         mov al,bl                       ; n sectors
@@ -98,7 +98,7 @@ MBR_ReadDiskSector_16:
         add di,2
         loop .ReadDiskSector_16_ReadingLoop
         ret
-; end of function MBR_ReadDiskSector_16
+; end of function ReadDiskSector_16
 
     times 510 - ($ - $$) db 0
     db 0x55,0xaa                        ; magic number

@@ -3,3 +3,4 @@ disk/bochs.out
 disk/hd60M.img
 
 *.bin
+*.o

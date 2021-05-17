@@ -96,7 +96,13 @@ ProctectionModeStart:
     mov gs,ax
     mov byte [gs:160],'P'
 
-; first thing we do is start the page mode
+; first thing we do is load the kernel.bin to the RAM 
+    mov esi,KERNEL_START_SECTOR
+    mov edi,KERNEL_BIN_BASE_ADDR
+    mov edx,KERNEL_SUM_SECTOR               ; read this much sectors
+    call ReadDiskSector_32
+
+; second thing we do is start the page mode
     ; 1 setup PDE and related PTE
     call SetupPage
     ; 2 modify the GDT to make it work in paging mode
@@ -118,6 +124,7 @@ ProctectionModeStart:
 
     mov byte [gs:162],'V'
     jmp $
+; end of ProctectionModeStart    for now..
 
 SetupPage:
 ; ---------- this function setup the Page Directory Entry and Page Table Entry ----------
@@ -166,6 +173,65 @@ SetupPage:
         loop .SetupPage_CreateKernelPDE
         ret
 ; ---------- end of function SetupPage ----------
+
+; ---------- start of function ReadDiskSector_32
+; function MBR_ReadDiskSector_32(LBA_addr, writing_addr, n), read n sectors from hard-disk in 32 bit mode
+; esi: LBA addr of start sector
+; edi: writing addr
+; edx: n
+ReadDiskSector_32:
+        ; read sectors
+        mov ebx,edx                     ; bx keeps the n
+        mov ax,bx                       ; n sectors
+        mov dx,0x1F2                    ; set reg Sector count 
+        out dx,al                       ; read n sectors
+
+        ; set LBA addr
+        mov eax,esi
+        mov dx,0x1F3                    ; set reg LBA low
+        out dx,al                       ; write low 8 bits
+
+        mov cl,8
+        shr eax,cl
+        mov dx,0x1F4                    ; set reg LBA mid
+        out dx,al                       ; write LBA mid
+
+        shr eax,cl
+        mov dx,0x1F5                    ; set reg LBA high
+        out dx,al                       ; write LBA high
+
+        shr eax,cl
+        and al,0xF                      ; only 4 bits
+        or al,0xE0                      ; 1110b: LBA mode, disk: master
+        mov dx,0x1F6                    ; set reg device
+        out dx,al                       ; set mode and LBA addr
+
+        ; ready to read
+        mov dx,0x1F7                    ; set reg command
+        mov al,0x20                     ; mode: read
+        out dx,al                       ; do read
+
+        ; check disk status
+    .ReadDiskSector_32_DiskNotReady:
+        in al,dx                        ; get disk status
+        and al,0x88                     ; result 0x8 => disk is read 
+                                        ; result 0x80 => disk is busy
+        cmp al,0x08
+        jnz .ReadDiskSector_32_DiskNotReady
+
+        ; read data
+        mov ax,bx                       ; get n
+        mov dx,256                      ; read by word, so dx = 512 / 2
+        mul dx                          ; assum this mul won't overflow
+        mov cx,ax                       ; sum of words need to read
+        mov dx,0x1F0                    ; set reg data
+    .ReadDiskSector_32_ReadingLoop:
+        in ax,dx                        ; read a word
+        mov [edi],ax                     ; write a word
+        add edi,2
+        loop .ReadDiskSector_32_ReadingLoop
+        ret
+; end of function ReadDiskSector_32
 
 
 

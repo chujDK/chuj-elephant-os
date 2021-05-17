@@ -2,6 +2,10 @@
 LOADER_BASE_ADDR equ 0x600                  ; 0x500 ~ 0x7BFF
 LOADER_START_SECTOR equ 0x2
 
+KERNEL_START_SECTOR equ 0x9
+KERNEL_SUM_SECTOR equ 200
+KERNEL_BIN_BASE_ADDR equ 0x60000            ; where we put the kernel.bin
+
 ;---------- gdt related ----------
 ; G, D, L, AVL sign
 DESC_G_4K equ 1_00000000000000000000000b    ; set grid 4K
