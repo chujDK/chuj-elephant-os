@@ -5,6 +5,10 @@ LOADER_START_SECTOR equ 0x2
 KERNEL_START_SECTOR equ 0x9
 KERNEL_SUM_SECTOR equ 200
 KERNEL_BIN_BASE_ADDR equ 0x60000            ; where we put the kernel.bin
+KERNEL_ENTER_POINT equ 0xC0001500           ; the kernel enter point addr
+
+;--------- elf related ----------
+PT_NULL equ 0                               ; segment type 
 
 ;---------- gdt related ----------
 ; G, D, L, AVL sign

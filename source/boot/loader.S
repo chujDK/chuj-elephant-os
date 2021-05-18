@@ -123,8 +123,15 @@ ProctectionModeStart:
     lgdt [gdt_ptr]                          ; change GDTR
 
     mov byte [gs:162],'V'
-    jmp $
-; end of ProctectionModeStart    for now..
+
+; last thing we do is extract the Ttext to where it belongs
+    jmp SELECTOR_CODE:EnterKernel
+    EnterKernel:
+    call KernelInit
+    mov esp,0xC009F000                      ; set kernel stack
+    jmp KERNEL_ENTER_POINT                  ; enter kernel
+; end of ProctectionModeStart
+; end of loader, thank you and goodbye!
 
 SetupPage:
 ; ---------- this function setup the Page Directory Entry and Page Table Entry ----------
@@ -180,58 +187,136 @@ SetupPage:
 ; edi: writing addr
 ; edx: n
 ReadDiskSector_32:
-        ; read sectors
-        mov ebx,edx                     ; bx keeps the n
-        mov ax,bx                       ; n sectors
-        mov dx,0x1F2                    ; set reg Sector count 
-        out dx,al                       ; read n sectors
+    ; read sectors
+    mov ebx,edx                     ; bx keeps the n
+    mov ax,bx                       ; n sectors
+    mov dx,0x1F2                    ; set reg Sector count 
+    out dx,al                       ; read n sectors
 
-        ; set LBA addr
-        mov eax,esi
-        mov dx,0x1F3                    ; set reg LBA low
-        out dx,al                       ; write low 8 bits
+    ; set LBA addr
+    mov eax,esi
+    mov dx,0x1F3                    ; set reg LBA low
+    out dx,al                       ; write low 8 bits
 
-        mov cl,8
-        shr eax,cl
-        mov dx,0x1F4                    ; set reg LBA mid
-        out dx,al                       ; write LBA mid
+    mov cl,8
+    shr eax,cl
+    mov dx,0x1F4                    ; set reg LBA mid
+    out dx,al                       ; write LBA mid
 
-        shr eax,cl
-        mov dx,0x1F5                    ; set reg LBA high
-        out dx,al                       ; write LBA high
+    shr eax,cl
+    mov dx,0x1F5                    ; set reg LBA high
+    out dx,al                       ; write LBA high
 
-        shr eax,cl
-        and al,0xF                      ; only 4 bits
-        or al,0xE0                      ; 1110b: LBA mode, disk: master
-        mov dx,0x1F6                    ; set reg device
-        out dx,al                       ; set mode and LBA addr
+    shr eax,cl
+    and al,0xF                      ; only 4 bits
+    or al,0xE0                      ; 1110b: LBA mode, disk: master
+    mov dx,0x1F6                    ; set reg device
+    out dx,al                       ; set mode and LBA addr
 
-        ; ready to read
-        mov dx,0x1F7                    ; set reg command
-        mov al,0x20                     ; mode: read
-        out dx,al                       ; do read
+    ; ready to read
+    mov dx,0x1F7                    ; set reg command
+    mov al,0x20                     ; mode: read
+    out dx,al                       ; do read
 
-        ; check disk status
-    .ReadDiskSector_32_DiskNotReady:
-        in al,dx                        ; get disk status
-        and al,0x88                     ; result 0x8 => disk is read 
-                                        ; result 0x80 => disk is busy
-        cmp al,0x08
-        jnz .ReadDiskSector_32_DiskNotReady
+    ; check disk status
+.ReadDiskSector_32_DiskNotReady:
+    in al,dx                        ; get disk status
+    and al,0x88                     ; result 0x8 => disk is read 
+                                    ; result 0x80 => disk is busy
+    cmp al,0x08
+    jnz .ReadDiskSector_32_DiskNotReady
 
-        ; read data
-        mov ax,bx                       ; get n
-        mov dx,256                      ; read by word, so dx = 512 / 2
-        mul dx                          ; assum this mul won't overflow
-        mov cx,ax                       ; sum of words need to read
-        mov dx,0x1F0                    ; set reg data
-    .ReadDiskSector_32_ReadingLoop:
-        in ax,dx                        ; read a word
-        mov [edi],ax                     ; write a word
-        add edi,2
-        loop .ReadDiskSector_32_ReadingLoop
-        ret
+    ; read data
+    mov ax,bx                       ; get n
+    mov dx,256                      ; read by word, so dx = 512 / 2
+    mul dx                          ; assum this mul won't overflow
+    mov cx,ax                       ; sum of words need to read
+    mov dx,0x1F0                    ; set reg data
+.ReadDiskSector_32_ReadingLoop:
+    in ax,dx                        ; read a word
+    mov [edi],ax                     ; write a word
+    add edi,2
+    loop .ReadDiskSector_32_ReadingLoop
+    ret
 ; end of function ReadDiskSector_32
 
+FatalKernelBroken:
+    mov byte [gs:0],'F'    
+    mov byte [gs:1],0xA4
+    mov byte [gs:2],'A'
+    mov byte [gs:3],0xA4
+    mov byte [gs:4],'T'
+    mov byte [gs:5],0xA4
+    mov byte [gs:6],'A'
+    mov byte [gs:7],0xA4
+    mov byte [gs:8],'L'
+    mov byte [gs:9],0xA4
+    mov byte [gs:10],':'
+    mov byte [gs:11],0xA4
+    mov byte [gs:12],' '
+    mov byte [gs:14],'K'
+    mov byte [gs:16],'E'
+    mov byte [gs:18],'R'
+    mov byte [gs:20],'N'
+    mov byte [gs:22],'E'
+    mov byte [gs:24],'L'
+    mov byte [gs:26],' '
+    mov byte [gs:28],'B'
+    mov byte [gs:30],'R'
+    mov byte [gs:32],'O'
+    mov byte [gs:34],'K'
+    mov byte [gs:36],'E'
+    mov byte [gs:38],'N'
+    jmp $
 
+KernelInit:
+    mov eax,[KERNEL_BIN_BASE_ADDR]          ; check the magic number
+    cmp eax,0x464c457f
+    jne FatalKernelBroken            
+    mov al,[KERNEL_BIN_BASE_ADDR + 4]       ; make sure it is a 32 bits elf 
+    cmp al,1
+    jne FatalKernelBroken
+    mov al,[KERNEL_BIN_BASE_ADDR + 5]       ; make sure it is a LSB elf
+    cmp al,1
+    jne FatalKernelBroken
+    ; check done
+
+    mov ebx,[KERNEL_BIN_BASE_ADDR + 28]     ; offset of program header table
+    add ebx,KERNEL_BIN_BASE_ADDR            ; address of program header table 
+    xor edx,edx
+    mov dx,[KERNEL_BIN_BASE_ADDR + 42]     ; program header size
+    mov cx,[KERNEL_BIN_BASE_ADDR + 44]      ; sum of segments
+
+    .LoadKernelEachSegment:
+        cmp byte [ebx],PT_NULL              ; skip th null segment
+        je .LoadKernelEachSegment_PT_NULL
+        push dword [ebx + 16]               ; nbytes, p_filesz
+        mov eax,[ebx + 4]                   
+        add eax,KERNEL_BIN_BASE_ADDR        ; src
+        push eax
+        push dword [ebx + 8]                ; dst
+        call mem_cpy                        
+        add esp,12                          ; unpush 3
+        .LoadKernelEachSegment_PT_NULL:    
+        add ebx,edx                         ; skip the header
+    loop .LoadKernelEachSegment
+    ret
+
+; ---------- function mem_cpy(dst,src,nbytes) ----------
+mem_cpy:
+    push ebp
+    mov ebp,esp
+    push edi
+    push esi
+    push ecx
+    mov edi,[ebp + 8]   ; dst
+    mov esi,[ebp + 12]   ; src
+    mov ecx,[ebp + 16]  ; nbytes
+    cld
+    rep movsb
+    pop ecx
+    pop esi
+    pop edi
+    leave
+    ret
 
