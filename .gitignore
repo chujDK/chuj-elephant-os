@@ -1,6 +1,7 @@
 .bochs-source/
 disk/bochs.out
 disk/hd60M.img
+source/kernel/*.S
 
 *.bin
 *.o
