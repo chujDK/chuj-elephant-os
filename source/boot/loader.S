@@ -94,7 +94,7 @@ ProctectionModeStart:
     mov esp,LOADER_STACK_TOP
     mov ax,SELECTOR_VIDEO
     mov gs,ax
-    mov byte [gs:160],'P'
+    mov byte [gs:2],'P'
 
 ; first thing we do is load the kernel.bin to the RAM 
     mov esi,KERNEL_START_SECTOR
@@ -122,7 +122,7 @@ ProctectionModeStart:
     
     lgdt [gdt_ptr]                          ; change GDTR
 
-    mov byte [gs:162],'V'
+    mov byte [gs:4],'V'
 
 ; last thing we do is extract the Ttext to where it belongs
     jmp SELECTOR_CODE:EnterKernel
