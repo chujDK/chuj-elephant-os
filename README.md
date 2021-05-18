@@ -15,3 +15,5 @@
 [GDT setup (just a little) and enter Protected Mode](https://www.cjovi.icu/OS/1323.html)
 
 [enter Paging mode](https://www.cjovi.icu/OS/1327.html)
+
+[boot kernel](https://www.cjovi.icu/OS/1330.html)

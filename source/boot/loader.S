@@ -29,7 +29,7 @@ GDT_LIMIT equ GDT_SIZE - 1
 times 60 dq 0                           ; reserve 60 GDTs
 
 TOTAL_MEM_BYTES dd 0                    ; memory of the machine
-                                        ; addr: LOADER_BASE_ADDR + 0x10 + 0x200 = 0x800
+                                        ; addr: LOADER_BASE_ADDR + 0x10 + 0x200 = 0x810
 
 SELECTOR_CODE equ ((CODE_DESC - GDT_BASE) / 8) << 3 + TI_GDT + RPL0
 SELECTOR_DATA equ ((DATA_STACK_DESC - GDT_BASE) / 8) << 3 + TI_GDT + RPL0
@@ -131,7 +131,7 @@ ProctectionModeStart:
     mov esp,0xC009F000                      ; set kernel stack
     jmp KERNEL_ENTER_POINT                  ; enter kernel
 ; end of ProctectionModeStart
-; end of loader, thank you and goodbye!
+; end of loader, thank you and farewell!
 
 SetupPage:
 ; ---------- this function setup the Page Directory Entry and Page Table Entry ----------
