@@ -2,6 +2,12 @@
 
 本人对《操作系统真象还原》一书中的操作系统的实现
 
+# where to run 
+you can run in
+
+* [bochs](https://bochs.sourceforge.io/)
+* A real IA-32 machine
+
 # how to run
 ```
 ./create_disk.sh
