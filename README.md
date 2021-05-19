@@ -1,18 +1,24 @@
 # chuj-elephant-OS
 
-本人对《操作系统真象还原》一书中的操作系统的实现
+My implement of the operating system in the book 《操作系统真象还原》
 
 # where to run 
+
 you can run in
 
 * [bochs](https://bochs.sourceforge.io/)
 * A real IA-32 machine
 
 # how to run
+
+using bochs, following scripts are provided
+
 ```
 ./create_disk.sh
 ./start_bochs.sh
 ```
+
+directly running in a real machine is not suggested
 
 # finished
 
