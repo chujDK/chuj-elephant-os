@@ -39,7 +39,7 @@ sys_putchar:
     jz .sys_putchar_LineFeed
     cmp cl,0x08                                     ; BF(BackSpace): 0x08
     jz .sys_putchar_BackSpace
-    jmp .sys_putchar_AnyOther                          ; Any other char
+    jmp .sys_putchar_AnyOther                       ; Any other char
 
     .sys_putchar_BackSpace:
         dec bx                                      ; cursor back one step
@@ -67,7 +67,7 @@ sys_putchar:
         mov bx,bx                                   ; low 16 bits of the number to be div
         mov si,80                                   ; diver
         div si                                      
-        sub bx,dx                                   ; dx = dx - dx % 80 => make the cursor point to the front of the line
+        sub bx,dx                                   ; bx = bx - bx % 80 => make the cursor point to the front of the line
                                                     ; CR done 
         add bx,80                                   ; dx = dx + 80 => point to the next line
                                                     ; LF done
