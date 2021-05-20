@@ -11,14 +11,15 @@ you can run in
 
 # how to run
 
-using bochs, following scripts are provided
+if using bochs, simply use the following script
 
 ```
-./create_disk.sh
 ./start_bochs.sh
 ```
 
-directly running in a real machine is not suggested
+directly running in a real machine is not suggested, so, do not do that!
+
+Makefile is provided, simply type `make` to build the disk image
 
 # finished
 
