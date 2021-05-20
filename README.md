@@ -29,3 +29,5 @@ directly running in a real machine is not suggested
 [enter Paging mode](https://www.cjovi.icu/OS/1327.html)
 
 [boot kernel](https://www.cjovi.icu/OS/1330.html)
+
+sys_putchar
