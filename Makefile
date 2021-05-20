@@ -15,8 +15,7 @@ DIR_DISK = ./disk
 
 ${DIR_DISK}/bochsrc.disk : ${BIN}/kernel.bin ${BIN}/mbr.bin ${BIN}/loader.bin
 	@echo "writing to disk .."
-	bximage -mode=create -hd=60M -sectsize=512 -q hd60M.img
-	$(shell mv ./hd60M.img ./disk/hd60M.img)
+	bximage -mode=create -hd=60M -sectsize=512 -q ${DIR_DISK}/hd60M.img
 	dd if=${BIN}/mbr.bin of=${DIR_DISK}/hd60M.img bs=512 count=1 seek=0 conv=notrunc
 	dd if=${BIN}/loader.bin of=${DIR_DISK}/hd60M.img bs=512 count=4 seek=2 conv=notrunc
 	dd if=${BIN}/kernel.bin of=${DIR_DISK}/hd60M.img bs=512 count=200 seek=9 conv=notrunc
