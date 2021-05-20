@@ -1,8 +1,5 @@
 #!/bin/bash
+make
 DIR=$(dirname $0)
-cd $DIR
-./source/all_write_to_disk.sh
-cd ./disk
+cd $DIR/disk
 ./run.sh
-#$DIR/source/all_write_to_disk.sh
-#$DIR/disk/run.sh
