@@ -4,9 +4,36 @@ SELECTOR_VIDEO equ (0x0003 << 3) + TI_GDT + RPL0
 
 [bits 32]
 section .text
+
+; -------------------- sys_putstr --------------------
+; write a string (end by '\0')
+; ----------------------------------------------------
+global sys_putstr
+sys_putstr:
+    push ecx
+    push ebx
+    mov ebx,[esp + 12]
+    xor ecx,ecx
+    xor eax,eax
+    .sys_putstr_PutNext:
+        mov cl,[ebx]
+        test cl,cl
+        jz .sys_putstr_EndOfStr
+        push ecx
+        call sys_putchar
+        add esp,4
+        inc ebx
+        inc eax
+        jmp .sys_putstr_PutNext
+    .sys_putstr_EndOfStr:
+    pop ebx
+    pop ecx
+    ret
+; -------------------- end of function sys_putstr --------------------
+
 ; -------------------- sys_putchar --------------------
 ; write one char in stack to the cursor
-; --------------------------------------------------
+; -----------------------------------------------------
 global sys_putchar
 sys_putchar:
     pushad                                          ; backup all regs (8 * 4 = 32bytes)
