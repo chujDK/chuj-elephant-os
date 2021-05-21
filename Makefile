@@ -35,15 +35,35 @@ ${BIN}/kernel/print.o : ${DIR_LIB}/kernel/print.S
 ${BIN}/main.o : ${DIR_KERNEL}/main.c
 	@echo "making main.o .."
 	$(shell mkdir -p ./bin)
-	gcc -I ${DIR_LIB}/kernel/ -c -o ${BIN}/main.o ${DIR_KERNEL}/main.c \
-		-m32 -fno-asynchronous-unwind-tables -std=c99
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
+		-c -o ${BIN}/main.o ${DIR_KERNEL}/main.c \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin
 
-${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o
+${BIN}/kernel.o : ${DIR_KERNEL}/kernel.S
+	@echo "making kernel.o .."
+	$(shell mkdir -p ./bin)
+	nasm -f elf -o ${BIN}/kernel.o ${DIR_KERNEL}/kernel.S
+
+${BIN}/interrupt.o : ${DIR_KERNEL}/interrupt.c
+	@echo "making interrupt.o .."
+	$(shell mkdir -p ./bin)
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
+		-c -o ${BIN}/interrupt.o ${DIR_KERNEL}/interrupt.c \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin
+
+${BIN}/init.o : ${DIR_KERNEL}/init.c
+	@echo "making init.o .."
+	$(shell mkdir -p ./bin)
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
+		-c -o ${BIN}/init.o ${DIR_KERNEL}/init.c \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin
+
+${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel.o ${BIN}/interrupt.o ${BIN}/init.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o ${BIN}/kernel.bin	\
-		 -m elf_i386 ${BIN}/main.o ${BIN}/kernel/print.o
+		 -m elf_i386 $^
 
 .PHONY : clean
 
 clean :
-	@echo "clean!"
+	rm -rf ${BIN}/
