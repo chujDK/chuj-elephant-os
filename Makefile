@@ -1,14 +1,10 @@
 DIR_BOOT = ./source/boot
 DIR_KERNEL = ./source/kernel
 DIR_LIB = ./source/lib
-#DIR_DISK = ./disk
-#
+
 ## boot related
 SRC_BOOT = ${DIR_BOOT}/*.S
 DIR_BOOT_INC = ${DIR_BOOT}/include
-#
-#
-#
 
 BIN = ./bin
 DIR_DISK = ./disk

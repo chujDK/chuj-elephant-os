@@ -9,6 +9,16 @@ you can run in
 * [bochs](https://bochs.sourceforge.io/)
 * A real IA-32 machine
 
+# making dependence
+
+Only tested under Ubuntu 20.04, with following program installed
+
+* gcc-4.8
+* nasm
+* dd
+* ld
+
+
 # how to run
 
 if using bochs, simply use the following script
