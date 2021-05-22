@@ -4,12 +4,9 @@
 %define NONE_ERROR_CODE push 0
 ; when this is no error code pushed, push a 0 manually
 ; then we can process easier
-
-extern sys_putstr
+extern idt_table
 
 section .data
-INTR_str db "A interrupt occur!", 0xa, 0
-
 global interrupt_entry_table
 interrupt_entry_table:
 
@@ -18,21 +15,39 @@ section .text
 INTR%1Entry:
     %2                                          ; make all kinds of INTeRrupt
                                                 ; has the same stack struct
-    push INTR_str
-    call sys_putstr
-    add esp,4                                   ; react to the INT signl
+                                                ; means a int with error code, push noting
+                                                ; a int without error code, push a "error code"
+    push ds
+    push es
+    push fs
+    push gs
+    pushad                                      ; save the context
     
     ; send EOI(End Of Interrupt) to the 8259A
     mov al,0x20                                 ; EOI
     out 0xa0,al                                 ; send to slave
     out 0x20,al                                 ; send to master
 
-    add esp,4                                   ; pass error code
-    iret                                        ; Interrupt return
+    push %1                                     ; push it anyway
+    call [idt_table + %1 * 4]                   ; the the C function
+    jmp IntExit
 
 section .data
     dd INTR%1Entry
 %endmacro
+
+section .text
+global IntExit                                  
+; ---------- this function mainly restored the context ----------
+IntExit:
+    add esp,4                                   ; pass the int number
+    popad
+    pop gs
+    pop fs
+    pop es
+    pop ds                                      ; restore the context
+    add esp,4                                   ; pass the error code
+    iretd
 
 VECTOR 0x00,NONE_ERROR_CODE
 VECTOR 0x01,NONE_ERROR_CODE

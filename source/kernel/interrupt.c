@@ -1,4 +1,5 @@
 #include "interrupt.h"
+#include "print.h"
 #include "stdint.h"
 #include "global.h"
 #include "io.h"
@@ -24,6 +25,65 @@ static void MakeIdtDesc(struct INT_gate_desc* p_Gdesc, uint8_t attribute, intr_h
 static struct INT_gate_desc IDT[IDT_DESC_SUM]; /* Interrupt Descriptor Table */
 
 extern intr_handler interrupt_entry_table[IDT_DESC_SUM]; /* Interrupt handle function */
+char* interrupt_name[IDT_DESC_SUM];
+intr_handler idt_table[IDT_DESC_SUM]; /* stores all the interrupt handle function */
+
+static void GeneralIntHandler(uint8_t int_vertor_number)
+{
+    char str_num[4];
+    if (int_vertor_number == 0x27 || int_vertor_number == 0x2F)
+    {
+        /* 0x27: spurious interrupt, needless to handle;
+         * 0x2F: the last IRQ in the slave 8259A, still needless to handle */
+        return;
+    }
+    sys_putstr("int vector :");
+    int cnt = 0;
+    while(int_vertor_number)
+    {
+        str_num[cnt++] = int_vertor_number % 10 + '0';
+        int_vertor_number /= 10;
+    }
+    int tmp = str_num[0];
+    str_num[0] = str_num[cnt - 1];
+    str_num[cnt - 1] = tmp;
+    str_num[cnt] = 0;
+    sys_putstr(str_num);
+    sys_putchar('\n');
+    return;
+}
+
+static void ExceptionInit()
+{
+    sys_putstr("exception init..");
+    for (int i = 0; i < IDT_DESC_SUM; i++)
+    {
+        idt_table[i] = GeneralIntHandler;
+        interrupt_name[i] = "unkown";
+    }
+    interrupt_name[0] = "#DE Divide Error";
+    interrupt_name[1] = "#DB Debug Exception";
+    interrupt_name[2] = "NMI Interrupt";
+    interrupt_name[3] = "#BP Breakpoint Exception";
+    interrupt_name[4] = "#OF Overflow Exception";
+    interrupt_name[5] = "#BR BOUND Range Exceeded Exception";
+    interrupt_name[6] = "#UD Invalid Opcode Exception";
+    interrupt_name[7] = "#NM Device Not Available Exception";
+    interrupt_name[8] = "#DF Double Fault Exception";
+    interrupt_name[9] = "Coprocessor Segment Overrun";
+    interrupt_name[10] = "#TS Invalid TSS Exception";
+    interrupt_name[11] = "#NP Segment Not Present";
+    interrupt_name[12] = "#SS Stack Fault Exception";
+    interrupt_name[13] = "#GP General Protection Exception";
+    interrupt_name[14] = "#PF Page-Fault Exception";
+    /* interrupt_name[15] is reserved,unused */
+    interrupt_name[16] = "#MF x87 FPU Floating-Point Error";
+    interrupt_name[17] = "#AC Alignment Check Exception";
+    interrupt_name[18] = "#MC Machine-Check Exception";
+    interrupt_name[19] = "#XF SIMD Floating-Point Exception";
+    sys_putstr(" done\n");
+    return;
+}
 
 static void MakeIdtDesc(struct INT_gate_desc* p_Gdesc, uint8_t attribute, intr_handler function)
 {
@@ -71,6 +131,7 @@ void IdtInit()
 {
     sys_putstr("setting up IDT..\n");
     IdtDescInit();
+    ExceptionInit();
     PicInit(); /* init 8259A */
 
     /* load IDT */

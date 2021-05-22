@@ -11,6 +11,7 @@ DIR_DISK = ./disk
 
 ${DIR_DISK}/bochsrc.disk : ${BIN}/kernel.bin ${BIN}/mbr.bin ${BIN}/loader.bin
 	@echo "writing to disk .."
+	$(shell rm ./disk/hd60M.img)
 	bximage -mode=create -hd=60M -sectsize=512 -q ${DIR_DISK}/hd60M.img
 	dd if=${BIN}/mbr.bin of=${DIR_DISK}/hd60M.img bs=512 count=1 seek=0 conv=notrunc
 	dd if=${BIN}/loader.bin of=${DIR_DISK}/hd60M.img bs=512 count=4 seek=2 conv=notrunc
@@ -37,7 +38,7 @@ ${BIN}/main.o : ${DIR_KERNEL}/main.c
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
 		-c -o ${BIN}/main.o ${DIR_KERNEL}/main.c \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
 
 ${BIN}/kernel.o : ${DIR_KERNEL}/kernel.S
 	@echo "making kernel.o .."
@@ -49,14 +50,14 @@ ${BIN}/interrupt.o : ${DIR_KERNEL}/interrupt.c
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
 		-c -o ${BIN}/interrupt.o ${DIR_KERNEL}/interrupt.c \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
 
 ${BIN}/init.o : ${DIR_KERNEL}/init.c
 	@echo "making init.o .."
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
 		-c -o ${BIN}/init.o ${DIR_KERNEL}/init.c \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
 
 ${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel.o ${BIN}/interrupt.o ${BIN}/init.o
 	@echo "making kernel.bin .."
