@@ -1,5 +1,6 @@
 DIR_BOOT = ./source/boot
 DIR_KERNEL = ./source/kernel
+DIR_DEVICE = ./source/device
 DIR_LIB = ./source/lib
 
 ## boot related
@@ -36,7 +37,7 @@ ${BIN}/kernel/print.o : ${DIR_LIB}/kernel/print.S
 ${BIN}/main.o : ${DIR_KERNEL}/main.c
 	@echo "making main.o .."
 	$(shell mkdir -p ./bin)
-	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
 		-c -o ${BIN}/main.o ${DIR_KERNEL}/main.c \
 		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
 
@@ -48,18 +49,25 @@ ${BIN}/kernel.o : ${DIR_KERNEL}/kernel.S
 ${BIN}/interrupt.o : ${DIR_KERNEL}/interrupt.c
 	@echo "making interrupt.o .."
 	$(shell mkdir -p ./bin)
-	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
 		-c -o ${BIN}/interrupt.o ${DIR_KERNEL}/interrupt.c \
 		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
 
 ${BIN}/init.o : ${DIR_KERNEL}/init.c
 	@echo "making init.o .."
 	$(shell mkdir -p ./bin)
-	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ \
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
 		-c -o ${BIN}/init.o ${DIR_KERNEL}/init.c \
 		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
 
-${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel.o ${BIN}/interrupt.o ${BIN}/init.o
+${BIN}/timer.o : ${DIR_DEVICE}/timer.c
+	@echo "making init.o .."
+	$(shell mkdir -p ./bin)
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
+		-c -o ${BIN}/timer.o ${DIR_DEVICE}/timer.c \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
+
+${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel.o ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o ${BIN}/kernel.bin	\
 		 -m elf_i386 $^

@@ -37,8 +37,13 @@ static void GeneralIntHandler(uint8_t int_vertor_number)
          * 0x2F: the last IRQ in the slave 8259A, still needless to handle */
         return;
     }
-    sys_putstr("int vector :");
+    sys_putstr("int vector: ");
     int cnt = 0;
+    if (int_vertor_number <= 19)
+    {
+        sys_putstr(interrupt_name[int_vertor_number]);
+        sys_putchar(' ');
+    }
     while(int_vertor_number)
     {
         str_num[cnt++] = int_vertor_number % 10 + '0';
@@ -55,7 +60,7 @@ static void GeneralIntHandler(uint8_t int_vertor_number)
 
 static void ExceptionInit()
 {
-    sys_putstr("exception init..");
+    sys_putstr("    exception init..");
     for (int i = 0; i < IDT_DESC_SUM; i++)
     {
         idt_table[i] = GeneralIntHandler;
