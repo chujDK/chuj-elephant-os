@@ -71,4 +71,45 @@ int strcmp(const char* a, const char* b)
         a_++;
         b_++;
     }
+    return 0;
+}
+
+char* strchr(const char* str, const uint8_t ch)
+{
+    ASSERT(str != NULL);
+    while (*str != 0)
+    {
+        if (*str == ch)
+        {
+            return (char *) str;
+        }
+        str++;
+    }
+    return NULL;
+}
+
+char* strrchr(const char* str, const uint8_t ch)
+{
+    ASSERT(str != NULL);
+    char* last_found = NULL;
+    while (*str != 0)
+    {
+        if (*str == ch)
+        {
+            return last_found = (char *) str;
+        }
+        str++;
+    }
+    return last_found;
+}
+
+char* strcat(char* dst,const char* src)
+{
+    ASSERT(dst != NULL && src != NULL);
+    char* str = dst;
+    while(*str++);
+    
+    --str;
+    while((*str++ = *src++));
+    return dst;
 }
