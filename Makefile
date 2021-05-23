@@ -67,7 +67,14 @@ ${BIN}/timer.o : ${DIR_DEVICE}/timer.c
 		-c -o ${BIN}/timer.o ${DIR_DEVICE}/timer.c \
 		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
 
-${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel.o ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o
+${BIN}/debug.o : ${DIR_KERNEL}/debug.c
+	@echo "making init.o .."
+	$(shell mkdir -p ./bin)
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
+		-c -o ${BIN}/debug.o ${DIR_KERNEL}/debug.c \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
+
+${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel.o ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o ${BIN}/debug.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o ${BIN}/kernel.bin	\
 		 -m elf_i386 $^

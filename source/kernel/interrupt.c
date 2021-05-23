@@ -11,6 +11,9 @@
 
 #define IDT_DESC_SUM 0x21 /* sum of supported interrupts */
 
+#define EFLAGS_IF 0x00000200 /* IF = 1 */
+#define GET_EFLAGS(EFLAGS_VAR) __asm__ volatile ("pushfl; popl %0" : "=g" (EFLAGS_VAR))
+
 /* interrupt gate descriptor */
 struct INT_gate_desc
 {
@@ -21,12 +24,12 @@ struct INT_gate_desc
     uint16_t function_offset_high_word;
 };
 
-static void MakeIdtDesc(struct INT_gate_desc* p_Gdesc, uint8_t attribute, intr_handler function);
+static void MakeIdtDesc(struct INT_gate_desc* p_Gdesc, uint8_t attribute, int_handler function);
 static struct INT_gate_desc IDT[IDT_DESC_SUM]; /* Interrupt Descriptor Table */
 
-extern intr_handler interrupt_entry_table[IDT_DESC_SUM]; /* Interrupt handle function */
+extern int_handler interrupt_entry_table[IDT_DESC_SUM]; /* Interrupt handle function */
 char* interrupt_name[IDT_DESC_SUM];
-intr_handler idt_table[IDT_DESC_SUM]; /* stores all the interrupt handle function */
+int_handler idt_table[IDT_DESC_SUM]; /* stores all the interrupt handle function */
 
 static void GeneralIntHandler(uint8_t int_vertor_number)
 {
@@ -90,7 +93,7 @@ static void ExceptionInit()
     return;
 }
 
-static void MakeIdtDesc(struct INT_gate_desc* p_Gdesc, uint8_t attribute, intr_handler function)
+static void MakeIdtDesc(struct INT_gate_desc* p_Gdesc, uint8_t attribute, int_handler function)
 {
     p_Gdesc->function_offset_low_word = ((uint32_t) function) & 0x0000FFFF;
     p_Gdesc->selector = SELECTOR_K_CODE;
@@ -130,6 +133,50 @@ static void IdtDescInit()
         MakeIdtDesc(&IDT[i], IDT_DESC_ATTRIBUTE_DPL0, interrupt_entry_table[i]);
     }
     sys_putstr(" done\n");
+}
+
+enum int_status EnableInt()
+{
+    enum int_status old_status;
+    if (INT_ON == GetIntStatus())
+    {
+        old_status = INT_ON;
+        return old_status;
+    }
+    else
+    {
+        old_status = INT_OFF;
+        __asm__ volatile ("sti" : : : "memory"); /* set IF = 1 */
+        return old_status;
+    }
+}
+
+enum int_status DisableInt()
+{
+    enum int_status old_status;
+    if (INT_ON == GetIntStatus())
+    {
+        old_status = INT_ON;
+        __asm__ volatile ("cli" : : : "memory"); /* set IF = 0 */
+        return old_status;
+    }
+    else
+    {
+        old_status = INT_OFF;
+        return old_status;
+    }
+}
+
+enum int_status GetIntStatus()
+{
+    uint32_t eflags = 0;
+    GET_EFLAGS(eflags);
+    return (eflags & EFLAGS_IF) ? INT_ON : INT_OFF;
+}
+
+enum int_status SetIntStatus(enum int_status status)
+{
+    return status & INT_ON ? EnableInt() : DisableInt();
 }
 
 void IdtInit()

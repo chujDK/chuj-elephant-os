@@ -8,4 +8,7 @@ typedef char uint8_t;
 typedef short uint16_t;
 typedef int uint32_t;
 typedef long long int uint64_t;
+
+#define NULL 0
+#define size_t uint32_t
 #endif
