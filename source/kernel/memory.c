@@ -59,11 +59,6 @@ static void VmemPoolInit(size_t all_mem)
     BitmapInit(&kernel_memory_pool.pool_bitmap);
     BitmapInit(&user_memory_pool.pool_bitmap);  
 
-    kernel_vaddr.vaddr_bitmap.bitmap_bytes_len = kernel_bitmap_length;
-    kernel_vaddr.vaddr_bitmap.bits = \
-        (void*)(kernel_bitmap_length + user_bitmap_length + MEM_BITMAP_BASE);
-    kernel_vaddr.vaddr_start = KERNEL_HEAP_BASE;
-    BitmapInit(&kernel_vaddr.vaddr_bitmap);   
     sys_putstr("\n    done\n");
 }
 
@@ -71,6 +66,15 @@ void VmemInit()
 {
     sys_putstr("vmem_init start..\n");
     size_t memory_total_bytes = *(size_t *) (0x810);
+    /* memory_pool init */
     VmemPoolInit(memory_total_bytes);
+
+    /* virtual_addr init */
+    kernel_vaddr.vaddr_bitmap.bitmap_bytes_len = kernel_bitmap_length;
+    kernel_vaddr.vaddr_bitmap.bits = \
+        (void*)(kernel_bitmap_length + user_bitmap_length + MEM_BITMAP_BASE);
+    kernel_vaddr.vaddr_start = KERNEL_HEAP_BASE;
+    BitmapInit(&kernel_vaddr.vaddr_bitmap);   
+
     sys_putstr("done\n");
 }
