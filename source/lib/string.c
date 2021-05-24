@@ -8,7 +8,8 @@ void memset(void* dst, uint8_t value, size_t size)
     uint8_t* dst_ = (uint8_t *)dst;
     while (size--)
     {
-        *dst_++ =value;
+        *dst_ = value;
+        ++dst_;
     }
     return;
 }

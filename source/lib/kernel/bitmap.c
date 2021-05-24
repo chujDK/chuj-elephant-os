@@ -11,7 +11,7 @@ void BitmapInit(struct bitmap* btmp)
     return;
 }
 
-bool BitmapTestBit(struct bitmap* btmp, size_t bit_idx)
+int BitmapTestBit(struct bitmap* btmp, size_t bit_idx)
 {
     size_t byte_idx = bit_idx / 8;
     size_t bit_order = bit_idx % 8;
@@ -32,7 +32,7 @@ int BitmapScan(struct bitmap* btmp, size_t cnt)
     }
     
     size_t bit_idx = 0;
-    while ((uint8_t)(BITMAP_MASK << bit_idx) & btmp->bits[bitmap_bytes_len])
+    while ((uint8_t)(BITMAP_MASK << bit_idx) & btmp->bits[byte_idx])
     {
         ++bit_idx;
     }

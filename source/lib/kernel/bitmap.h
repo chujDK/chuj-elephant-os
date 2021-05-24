@@ -9,7 +9,7 @@ struct bitmap
 };
 
 void BitmapInit(struct bitmap* btmp);
-bool BitmapTestBit(struct bitmap* btmp, size_t bit_idx);
+int BitmapTestBit(struct bitmap* btmp, size_t bit_idx);
 /* return 1 when the bit is 1 */
 int BitmapScan(struct bitmap* btmp, size_t cnt);
 void BitmapSetBit(struct bitmap* btmp, size_t bit_idx, int8_t value);

@@ -29,17 +29,17 @@ ${BIN}/loader.bin : ${DIR_BOOT}/loader.S
 	$(shell mkdir -p ./bin)
 	nasm -I ${DIR_BOOT_INC}/ -o ${BIN}/loader.bin ${DIR_BOOT}/loader.S 
 
-${BIN}/kernel/print.o : ${DIR_LIB}/kernel/print.S
-	@echo "making print.o .."
+${BIN}/kernel/print_asm.o : ${DIR_LIB}/kernel/print_asm.S
+	@echo "making print_asm.o .."
 	$(shell mkdir -p ./bin/kernel)
-	nasm -f elf -o ${BIN}/kernel/print.o ${DIR_LIB}/kernel/print.S
+	nasm -f elf -o $@ $^
 
 ${BIN}/main.o : ${DIR_KERNEL}/main.c
 	@echo "making main.o .."
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
-		-c -o $@ $^ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^ 
 
 ${BIN}/kernel.o : ${DIR_KERNEL}/kernel.S
 	@echo "making kernel.o .."
@@ -50,45 +50,61 @@ ${BIN}/interrupt.o : ${DIR_KERNEL}/interrupt.c
 	@echo "making interrupt.o .."
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
-		-c -o $@ $^ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^ 
 
 ${BIN}/init.o : ${DIR_KERNEL}/init.c
 	@echo "making init.o .."
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
-		-c -o $@ $^ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^ 
 
 ${BIN}/timer.o : ${DIR_DEVICE}/timer.c
 	@echo "making timer.o .."
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
-		-c -o $@ $^ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^ 
 
 ${BIN}/debug.o : ${DIR_KERNEL}/debug.c
 	@echo "making debug.o .."
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
-		-c -o $@ $^ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^ 
 
 ${BIN}/string.o : ${DIR_LIB}/string.c
 	@echo "making string.o .."
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
-		-c -o $@ $^ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^ 
 
 ${BIN}/bitmap.o : ${DIR_LIB}/kernel/bitmap.c
-	@echo "making string.o .."
+	@echo "making bitmap.o .."
 	$(shell mkdir -p ./bin)
 	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
-		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector
-		-c -o $@ $^ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^
 
-${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel.o ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o ${BIN}/debug.o ${BIN}/string.o
+${BIN}/memory.o : ${DIR_KERNEL}/memory.c
+	@echo "making memory.o .."
+	$(shell mkdir -p ./bin)
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^
+
+${BIN}/kernel/print.o : ${DIR_LIB}/kernel/print.c ${BIN}/kernel/print_asm.o
+	@echo "making print.o .."
+	$(shell mkdir -p ./bin)
+	gcc -I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ ${DIR_LIB}/kernel/print.c
+
+${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel/print_asm.o ${BIN}/kernel.o \
+   ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o ${BIN}/debug.o ${BIN}/string.o ${BIN}/memory.o \
+   ${BIN}/bitmap.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o $@ \
 		 -m elf_i386 $^
