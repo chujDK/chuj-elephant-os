@@ -1,6 +1,6 @@
 #ifndef __INTERTUPT_H
 #define __INTERTUPT_H
-#include "stdint.h"
+#include "global.h"
 
 typedef void* int_handler;
 void IdtInit();
