@@ -67,7 +67,7 @@ void* GetPDEPointer(void* vaddr)
 }
 
 /* alloc one page from the m_pool */
-static void* AllocOnePhysicPage(struct memory_pool* m_pool)
+static void* GetOnePhysicPage(struct memory_pool* m_pool)
 {
     int bit_idx = BitmapScan(&m_pool->pool_bitmap, 1); 
     if (bit_idx == -1)
@@ -103,7 +103,7 @@ static void PageMapping(void* v_addr, void* physic_page_addr)
     }
     else
     {
-        size_t pte_physic_addr = (size_t)(AllocOnePhysicPage(&kernel_memory_pool));
+        size_t pte_physic_addr = (size_t)(GetOnePhysicPage(&kernel_memory_pool));
         memset((void*)pte_physic_addr, 0, PAGE_SIZE); /* init the PTE(means nothing mapped) */
         *(size_t*)pde_addr = (pte_physic_addr | PAGE_P_1 | PAGE_US_U | PAGE_RW_RW);
         *(size_t*)pte_addr = ((size_t)physic_page_addr | PAGE_P_1 | PAGE_US_U | PAGE_RW_RW);
@@ -176,7 +176,7 @@ void* palloc(enum pool_flags pf, size_t page_cnt)
     void* vaddr = vaddr_start;
     while(page_cnt--)
     {
-        page_physic_addr = AllocOnePhysicPage(m_pool);
+        page_physic_addr = GetOnePhysicPage(m_pool);
         if (page_physic_addr == NULL)
         {
             /* free all alloced page to system, we will fill there when we finished free-related function */

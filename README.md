@@ -44,3 +44,5 @@ Makefile is provided, simply type `make` to build the disk image
 [sys_putchar and sys_putstr](https://www.cjovi.icu/OS/1336.html)
 
 [interrupt framework](https://www.cjovi.icu/OS/1339.html)
+
+[memory mapping](https://www.cjovi.icu/OS/1349.html)
