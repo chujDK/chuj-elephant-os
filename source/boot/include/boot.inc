@@ -65,7 +65,7 @@ TI_GDT equ 000b                                 ; set GDT selector
 TI_LDT equ 100b                                 ; set LDT selector
 
 ; ---------- page related ----------
-PAGE_DIR_TABLE_POS equ 0x10000              ; PDT start at 1M
+PAGE_DIR_TABLE_POS equ 0x100000              ; PDT start at 1M
 
 PG_P     equ 1                              ; Present sign
 PG_RW_RW equ 10                             ; page type:rw-

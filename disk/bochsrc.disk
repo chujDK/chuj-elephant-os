@@ -2,7 +2,7 @@
 
 # set the maximum RAM bochs can use
 # key word: megs
-megs: 256
+megs: 32
 
 # set the BIOS and VGA BIOS
 # key word: `romimage` and `vgaromimage`
