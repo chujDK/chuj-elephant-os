@@ -2,6 +2,9 @@
 #include "init.h"
 #include "debug.h"
 #include "memory.h"
+#include "thread.h"
+
+void KThreadTest(void *arg);
 
 int _start()
 {
@@ -9,12 +12,17 @@ int _start()
     char a[16];
     InitAll();
 
-    void* addr = kpalloc(5);
-    sys_putstr("we got 5 contiguous virtual page, start at: 0x");
-    sys_puthex(addr);
-    sys_putchar('\n');
-
+    ThreadStart("KThreadTest", 31, KThreadTest, "argA ");
     while(1);
     return 0;
+}
+
+void KThreadTest(void *arg)
+{
+    char *para = (char *) arg;
+    while(1)
+    {
+        sys_putstr(arg);
+    }
 }
 

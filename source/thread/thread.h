@@ -63,6 +63,7 @@ typedef struct task_struct
     uint32_t canary;
 }PCB;
 
+PCB* ThreadStart(char* name, int priority, thread_func function, void* func_arg);
 
 
 #endif
