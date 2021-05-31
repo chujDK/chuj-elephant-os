@@ -4,12 +4,30 @@
 #include "global.h"
 #include "memory.h"
 #include "print.h"
+#include "list.h"
+#include "interrupt.h"
+#include "debug.h"
 
 #define PAGE_SIZE 4096
 #define STACK_CANARY 0x32512332
 
+struct task_struct *main_thread;
+struct list ready_thread_list; 
+struct list all_thread_list;
+static struct list_elem *thread_tag;
+
+extern void switch_to(struct task_struct *current_thread, struct task_struct *next_thread);
+
+struct task_struct *GetCurrentThreadPCB()
+{
+    size_t esp;
+    __asm__ volatile ("mov %%esp,%0" : "=g" (esp));
+    return (struct task_struct*) (esp & 0xFFFFF000);
+}
+
 static void KernelThread(thread_func* function, void* func_arg)
 {
+    EnableInt();
     function(func_arg);
 }
 
@@ -32,6 +50,16 @@ void InitThread(PCB* pthread, char* name, int priority)
 {
     memset(pthread, 0, sizeof(*pthread));
     strcpy(pthread->name, name);
+
+    if (pthread == main_thread)
+    {
+        pthread->status = TASK_RUNNING;
+    }
+    else
+    {
+        pthread->status = TASK_READY;
+    }
+    
     pthread->status = TASK_RUNNING;
     pthread->priority = priority;
     pthread->self_kernel_stack = (uint32_t*)((uint32_t)pthread + PAGE_SIZE);
@@ -47,6 +75,21 @@ PCB* ThreadStart(char* name, \
     InitThread(thread_PCB, name, priority);
     ThreadCreate(thread_PCB, function, func_arg);
 
-    __asm__ volatile ("movl %0, %%esp; pop %%ebp; pop %%ebx; pop %%edi; pop %%esi; ret": : "g"(thread_PCB->self_kernel_stack) : "memory");
+    ASSERT(!elem_find(&ready_thread_list, &thread_PCB->general_tag));
+    list_append(&ready_thread_list, &thread_PCB->general_tag);
+
+    ASSERT(!elem_find(&all_thread_list, &thread_PCB->all_list_tag));
+    list_append(&all_thread_list, &thread_PCB->all_list_tag);
+
+    // __asm__ volatile ("movl %0, %%esp; pop %%ebp; pop %%ebx; pop %%edi; pop %%esi; ret": : "g"(thread_PCB->self_kernel_stack) : "memory");
     return thread_PCB;
+}
+
+static void CreateMainThread()
+{
+    main_thread = GetCurrentThreadPCB();
+    InitThread(main_thread, "main", 31);
+
+    ASSERT(!elem_find(&all_thread_list, &main_thread->all_list_tag));
+    list_append(&all_thread_list, &main_thread->all_list_tag);
 }

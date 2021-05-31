@@ -2,6 +2,7 @@
 #define __THREAD_THREAD_H
 
 #include "stdint.h"
+#include "list.h"
 
 typedef void thread_func(void*);
 
@@ -60,7 +61,15 @@ typedef struct task_struct
     enum task_status status;
     uint8_t priority;
     char name[16];
-    uint32_t canary;
+
+    uint8_t cpu_ticks_pertime;
+    uint8_t cpu_ticks_elapsed;
+
+    struct list_elem general_tag;
+    struct list_elem all_list_tag;
+
+    size_t PDE_addr;
+    size_t canary;
 }PCB;
 
 PCB* ThreadStart(char* name, int priority, thread_func function, void* func_arg);
