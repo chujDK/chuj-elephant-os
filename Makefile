@@ -112,9 +112,16 @@ ${BIN}/thread.o : ${DIR_THREAD}/thread.c
 		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
 		-c -o $@ $^
 
+${BIN}/kernel/list.o : ${DIR_LIB}/kernel/list.c
+	@echo "making thread.o .."
+	$(shell mkdir -p ./bin)
+	gcc ${INCLUDE_PATH} \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^
+
 ${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel/print_asm.o ${BIN}/kernel.o \
    ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o ${BIN}/debug.o ${BIN}/string.o ${BIN}/memory.o \
-   ${BIN}/bitmap.o ${BIN}/thread.o
+   ${BIN}/bitmap.o ${BIN}/thread.o ${BIN}/kernel/list.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o $@ \
 		 -m elf_i386 $^
