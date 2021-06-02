@@ -36,7 +36,7 @@ static void IntTimerHandler()
     struct task_struct* current_thread = RunningThread();
     
     /* detect stack overflow */
-    ASSERT(current_thread->cannary == STACK_CANARY);
+    ASSERT(current_thread->canary == STACK_CANARY);
 
     current_thread->cpu_ticks_elapsed++;
     ticks++;
