@@ -9,7 +9,6 @@
 #include "debug.h"
 
 #define PAGE_SIZE 4096
-#define STACK_CANARY 0x32512332
 
 struct task_struct *main_thread;
 struct list ready_thread_list; 
@@ -17,6 +16,35 @@ struct list all_thread_list;
 static struct list_elem *thread_tag;
 
 extern void switch_to(struct task_struct *current_thread, struct task_struct *next_thread);
+
+void ScheduleThread()
+{
+    ASSERT(GetIntStatus() == INT_OFF);
+    
+    struct task_struct* current_thread = RunningThread();
+    if (current_thread->status == TASK_RUNNING)
+    {
+        ASSERT(!elem_find(&ready_thread_list, &current_thread->general_tag));
+
+        list_append(&ready_thread_list, &current_thread->general_tag);
+        current_thread->cpu_ticks_left = current_thread->priority;
+        current_thread->status = TASK_READY;
+    }
+    else
+    {
+        // noting to do for now
+    }
+
+    ASSERT(!list_elem(&ready_thread_list));
+    thread_tag = NULL;
+
+    /* get the first READY task, send it to the CPU */
+    thread_tag = list_pop(&ready_thread_list);
+    struct task_struct* next_thread = elem2entry(struct task_struct, \
+                                          general_tag, thread_tag);
+    next_thread->status = TASK_RUNNING;
+    switch_to(current_thread, next_thread);
+}
 
 struct task_struct *GetCurrentThreadPCB()
 {

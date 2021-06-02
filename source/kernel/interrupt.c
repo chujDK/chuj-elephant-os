@@ -31,6 +31,11 @@ extern int_handler interrupt_entry_table[IDT_DESC_SUM]; /* Interrupt handle func
 char* interrupt_name[IDT_DESC_SUM];
 int_handler idt_table[IDT_DESC_SUM]; /* stores all the interrupt handle function */
 
+void RegisterHandler(uint8_t int_vector_num, int_handler function)
+{
+    idt_table[int_vector_num] = function;
+}
+
 static void GeneralIntHandler(uint8_t int_vertor_number)
 {
     char str_num[4];

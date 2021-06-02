@@ -4,6 +4,7 @@
 #include "stdint.h"
 #include "list.h"
 
+#define STACK_CANARY 0x32512332
 typedef void thread_func(void*);
 
 enum task_status
@@ -59,10 +60,10 @@ typedef struct task_struct
 {
     uint32_t *self_kernel_stack;
     enum task_status status;
-    uint8_t priority;
+    uint8_t priority; /* how many ticks the thread running per round */
     char name[16];
 
-    uint8_t cpu_ticks_pertime;
+    uint8_t cpu_ticks_left;
     uint8_t cpu_ticks_elapsed;
 
     struct list_elem general_tag;
@@ -73,6 +74,8 @@ typedef struct task_struct
 }PCB;
 
 PCB* ThreadStart(char* name, int priority, thread_func function, void* func_arg);
+
+void ScheduleThread();
 
 
 #endif

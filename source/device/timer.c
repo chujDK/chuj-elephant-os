@@ -1,6 +1,8 @@
 #include "timer.h"
 #include "io.h"
 #include "print.h"
+#include "debug.h"
+#include "thread.h"
 
 #define IRQ0_FREQUENCY      80
 #define PULSE_FREQUENCY     1193180
@@ -10,6 +12,9 @@
 #define COUNTER0_MODE       2 /* Rate Generator Mode */
 #define READ_WRITE_LATCH    3
 #define PIT_CONTROL_PORT    0x43 /* control word register port */
+
+size_t ticks; /* past ticks since intrrupt start */
+
 
 static void FrequencySet(uint8_t counter_port, \
                          uint8_t counter_num, \
@@ -26,6 +31,26 @@ static void FrequencySet(uint8_t counter_port, \
     outb(counter_port, (uint8_t) counter_value >> 8);
 }
 
+static void IntTimerHandler()
+{
+    struct task_struct* current_thread = RunningThread();
+    
+    /* detect stack overflow */
+    ASSERT(current_thread->cannary == STACK_CANARY);
+
+    current_thread->cpu_ticks_elapsed++;
+    ticks++;
+
+    if (current_thread->cpu_ticks_left == 0)
+    {
+        ScheduleThread();
+    }
+    else
+    {
+        current_thread->cpu_ticks_left--;
+    }
+}
+
 void TimerInit()
 {
     sys_putstr("timer init..");
@@ -34,5 +59,6 @@ void TimerInit()
                  READ_WRITE_LATCH, \
                  COUNTER0_MODE, \
                  COUNTER0_VALUE);
+    RegisterHandler(0x20, IntTimerHandler);
     sys_putstr(" done\n");
 }

@@ -4,6 +4,7 @@
 
 typedef void* int_handler;
 void IdtInit();
+void RegisterHandler(uint8_t int_vector_num, int_handler function);
 
 enum int_status
 {
