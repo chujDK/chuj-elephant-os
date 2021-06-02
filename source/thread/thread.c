@@ -17,11 +17,24 @@ static struct list_elem *thread_tag;
 
 extern void switch_to(struct task_struct *current_thread, struct task_struct *next_thread);
 
+struct task_struct *GetCurrentThreadPCB()
+{
+    size_t esp;
+    __asm__ volatile ("mov %%esp,%0" : "=g" (esp));
+    return (struct task_struct*) (esp & 0xFFFFF000);
+}
+
+static void KernelThread(thread_func* function, void* func_arg)
+{
+    EnableInt();
+    function(func_arg);
+}
+
 void ScheduleThread()
 {
     ASSERT(GetIntStatus() == INT_OFF);
     
-    struct task_struct* current_thread = RunningThread();
+    struct task_struct* current_thread = GetCurrentThreadPCB();
     if (current_thread->status == TASK_RUNNING)
     {
         ASSERT(!elem_find(&ready_thread_list, &current_thread->general_tag));
@@ -35,7 +48,7 @@ void ScheduleThread()
         // noting to do for now
     }
 
-    ASSERT(!list_elem(&ready_thread_list));
+    ASSERT(!list_len(&ready_thread_list));
     thread_tag = NULL;
 
     /* get the first READY task, send it to the CPU */
@@ -46,18 +59,6 @@ void ScheduleThread()
     switch_to(current_thread, next_thread);
 }
 
-struct task_struct *GetCurrentThreadPCB()
-{
-    size_t esp;
-    __asm__ volatile ("mov %%esp,%0" : "=g" (esp));
-    return (struct task_struct*) (esp & 0xFFFFF000);
-}
-
-static void KernelThread(thread_func* function, void* func_arg)
-{
-    EnableInt();
-    function(func_arg);
-}
 
 void ThreadCreate(PCB* pthread, thread_func function, void* func_arg)
 {

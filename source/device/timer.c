@@ -3,6 +3,7 @@
 #include "print.h"
 #include "debug.h"
 #include "thread.h"
+#include "interrupt.h"
 
 #define IRQ0_FREQUENCY      80
 #define PULSE_FREQUENCY     1193180
@@ -33,7 +34,7 @@ static void FrequencySet(uint8_t counter_port, \
 
 static void IntTimerHandler()
 {
-    struct task_struct* current_thread = RunningThread();
+    struct task_struct* current_thread = GetCurrentThreadPCB();
     
     /* detect stack overflow */
     ASSERT(current_thread->canary == STACK_CANARY);
