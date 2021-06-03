@@ -139,3 +139,23 @@ sys_putchar:
     ret
 ; -------------------- end of function sys_putchar --------------------
 
+global sys_setcursor
+sys_setcursor:
+    push ebx
+    mov bx,si
+    mov dx,0x3D4                                ; Address Reg (base)
+    mov al,0x0E                                 ; Cursor Location High Reg (idx)
+    out dx,al                                      
+    mov dx,0x3D5                                ; Data Reg (base)
+    mov al,bh
+    out dx,al                                   ; set the high 8 bits of the cursor addr
+
+    ; set the current cursor addr (low 8 bits)
+    mov dx,0x3D4                                ; Address Reg (base)
+    mov al,0x0F                                 ; Cursor Location low Reg (idx)
+    out dx,al                                       
+    mov dx,0x3D5                                ; Data Reg (base)
+    mov al,bl
+    out dx,al                                   ; set the low 8 bits of the cursor addr
+    pop ebx
+    ret

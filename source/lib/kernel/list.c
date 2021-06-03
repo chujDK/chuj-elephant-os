@@ -3,6 +3,7 @@
 
 #define true 1
 #define false 0
+#define NULL 0
 
 /* 初始化双向链表list */
 void list_init (struct list* list) {

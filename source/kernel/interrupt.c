@@ -39,7 +39,7 @@ void RegisterHandler(uint8_t int_vector_num, int_handler function)
 static void GeneralIntHandler(uint8_t int_vertor_number)
 {
     DisableInt();
-    char str_num[4];
+    sys_setcursor(0);
     if (int_vertor_number == 0x27 || int_vertor_number == 0x2F)
     {
         /* 0x27: spurious interrupt, needless to handle;
@@ -47,22 +47,12 @@ static void GeneralIntHandler(uint8_t int_vertor_number)
         return;
     }
     sys_putstr("int vector: ");
-    int cnt = 0;
+    sys_putint(int_vertor_number);
+    sys_putchar(' ');
     if (int_vertor_number <= 19)
     {
         sys_putstr(interrupt_name[int_vertor_number]);
-        sys_putchar(' ');
     }
-    while(int_vertor_number)
-    {
-        str_num[cnt++] = int_vertor_number % 10 + '0';
-        int_vertor_number /= 10;
-    }
-    int tmp = str_num[0];
-    str_num[0] = str_num[cnt - 1];
-    str_num[cnt - 1] = tmp;
-    str_num[cnt] = 0;
-    sys_putstr(str_num);
     sys_putchar('\n');
     while(1);
     return;
