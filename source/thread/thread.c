@@ -11,18 +11,18 @@
 
 #define PAGE_SIZE 4096
 
-struct task_struct *main_thread;
+PCB *main_thread;
 struct list ready_thread_list; 
 struct list all_thread_list;
 static struct list_elem *thread_tag;
 
-extern void switch_to(struct task_struct *current_thread, struct task_struct *next_thread);
+extern void switch_to(PCB *current_thread, PCB *next_thread);
 
-struct task_struct *GetCurrentThreadPCB()
+PCB *GetCurrentThreadPCB()
 {
     size_t esp;
     __asm__ volatile ("mov %%esp,%0" : "=g" (esp));
-    return (struct task_struct*) (esp & 0xFFFFF000);
+    return (PCB*) (esp & 0xFFFFF000);
 }
 
 static void KernelThread(thread_func* function, void* func_arg)
@@ -35,7 +35,7 @@ void ScheduleThread()
 {
     ASSERT(GetIntStatus() == INT_OFF);
     
-    struct task_struct* current_thread = GetCurrentThreadPCB();
+    PCB* current_thread = GetCurrentThreadPCB();
     if (current_thread->status == TASK_RUNNING)
     {
         ASSERT(!elem_find(&ready_thread_list, &current_thread->general_tag));
@@ -54,7 +54,7 @@ void ScheduleThread()
 
     /* get the first READY task, send it to the CPU */
     thread_tag = list_pop(&ready_thread_list);
-    struct task_struct* next_thread = elem2entry(struct task_struct, \
+    PCB* next_thread = elem2entry(PCB, \
                                           general_tag, thread_tag);
     next_thread->status = TASK_RUNNING;
     switch_to(current_thread, next_thread);
@@ -125,6 +125,37 @@ static void CreateMainThread()
 
     ASSERT(!elem_find(&all_thread_list, &main_thread->all_list_tag));
     list_append(&all_thread_list, &main_thread->all_list_tag);
+}
+
+void BlockThread(enum task_status stat)
+{
+    ASSERT( stat == TASK_BLOCKD || \
+            stat == TASK_WAITING || \
+            stat == TASK_HANGING);
+    enum int_status old_int_statu = DisableInt();
+    PCB* current_thread = GetCurrentThreadPCB();
+    current_thread->status = stat;
+    ScheduleThread();
+    SetIntStatus(old_int_statu);
+}
+
+void UnblockThread(PCB* pthread)
+{
+    enum int_status old_int_statu = DisableInt();
+    ASSERT( pthread->status == TASK_BLOCKD || \
+            pthread->status == TASK_HANGING || \
+            pthread->status == TASK_WAITING);
+    if (pthread->status != TASK_READY)
+    {
+        ASSERT(!elem_find(&ready_thread_list, &pthread->general_tag));
+        if (!elem_find(&ready_thread_list, &pthread->general_tag))
+        {
+            PANIC("blocked thread in ready_list");
+        }
+        list_push(&ready_thread_list, &pthread->general_tag);
+        pthread->status = TASK_READY;
+    }
+    SetIntStatus(old_int_statu);
 }
 
 /* init multi thread environment */

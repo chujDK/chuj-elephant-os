@@ -74,12 +74,10 @@ typedef struct task_struct
 }PCB;
 
 PCB* ThreadStart(char* name, int priority, thread_func function, void* func_arg);
-
 void ScheduleThread();
-
-struct task_struct *GetCurrentThreadPCB();
-
+PCB *GetCurrentThreadPCB();
 void ThreadInit();
-
+void BlockThread();
+void UnblockThread();
 
 #endif
