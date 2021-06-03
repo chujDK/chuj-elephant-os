@@ -30,7 +30,7 @@ void SemaphoreDown(struct semaphore* psema)
         {
             PANIC("thread already in wating list");
         }
-        list_append(&psema->waiting_thread_list, &current_thread);
+        list_append(&psema->waiting_thread_list, &current_thread->general_tag);
         BlockThread(TASK_BLOCKD);
     }
     psema->value--;

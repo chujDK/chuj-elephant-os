@@ -17,4 +17,8 @@ struct lock
     uint32_t holder_repeat_request_sum; /* repeat times of the lock's owner's requests */
 };
 
+void LockInit(struct lock* plock);
+void sys_lock_lock(struct lock* plock);
+void sys_lock_unlock(struct lock* plock);
+
 #endif

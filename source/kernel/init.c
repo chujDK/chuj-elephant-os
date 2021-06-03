@@ -3,6 +3,8 @@
 #include "interrupt.h"
 #include "timer.h"
 #include "memory.h"
+#include "thread.h"
+#include "console.h"
 
 void InitAll()
 {
@@ -11,5 +13,6 @@ void InitAll()
     TimerInit();
     VmemInit();
     ThreadInit();
+    ConsoleInit();
     return;
 }
