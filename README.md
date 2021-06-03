@@ -46,3 +46,5 @@ Makefile is provided, simply type `make` to build the disk image
 [interrupt framework](https://www.cjovi.icu/OS/1339.html)
 
 [memory mapping](https://www.cjovi.icu/OS/1349.html)
+
+[thread scheduling](https://www.cjovi.icu/OS/1359.html)
