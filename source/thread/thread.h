@@ -79,5 +79,7 @@ void ScheduleThread();
 
 struct task_struct *GetCurrentThreadPCB();
 
+void ThreadInit();
+
 
 #endif

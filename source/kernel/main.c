@@ -3,6 +3,7 @@
 #include "debug.h"
 #include "memory.h"
 #include "thread.h"
+#include "interrupt.h"
 
 void KThreadTest(void *arg);
 
@@ -12,8 +13,14 @@ int _start()
     char a[16];
     InitAll();
 
-    ThreadStart("KThreadTest", 31, KThreadTest, "argA ");
-    while(1);
+    ThreadStart("KThreadTest", 21, KThreadTest, "argA ");
+    ThreadStart("KThreadTest", 6, KThreadTest, "argB ");
+
+    EnableInt();
+    while(1)
+    {
+        sys_putstr("main ");
+    }
     return 0;
 }
 
@@ -25,4 +32,3 @@ void KThreadTest(void *arg)
         sys_putstr(arg);
     }
 }
-

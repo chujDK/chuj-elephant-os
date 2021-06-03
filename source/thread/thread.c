@@ -7,6 +7,7 @@
 #include "list.h"
 #include "interrupt.h"
 #include "debug.h"
+#include "switch.h"
 
 #define PAGE_SIZE 4096
 
@@ -48,7 +49,7 @@ void ScheduleThread()
         // noting to do for now
     }
 
-    ASSERT(!list_len(&ready_thread_list));
+    ASSERT(!list_empty(&ready_thread_list));
     thread_tag = NULL;
 
     /* get the first READY task, send it to the CPU */
@@ -75,7 +76,8 @@ void ThreadCreate(PCB* pthread, thread_func function, void* func_arg)
     kernel_thread->esi = kernel_thread->edi = 0;
 }
 
-void InitThread(PCB* pthread, char* name, int priority)
+/* init a new thread */
+static void InitThread(PCB* pthread, char* name, int priority)
 {
     memset(pthread, 0, sizeof(*pthread));
     strcpy(pthread->name, name);
@@ -89,8 +91,10 @@ void InitThread(PCB* pthread, char* name, int priority)
         pthread->status = TASK_READY;
     }
     
-    pthread->status = TASK_RUNNING;
     pthread->priority = priority;
+    pthread->cpu_ticks_left = priority;
+    pthread->cpu_ticks_elapsed = 0;
+    pthread->PDE_addr = NULL; /* null represent a kernel thread, use the kernel PDE */
     pthread->self_kernel_stack = (uint32_t*)((uint32_t)pthread + PAGE_SIZE);
     pthread->canary = STACK_CANARY;
 }
@@ -117,8 +121,19 @@ PCB* ThreadStart(char* name, \
 static void CreateMainThread()
 {
     main_thread = GetCurrentThreadPCB();
-    InitThread(main_thread, "main", 31);
+    InitThread(main_thread, "main", 21);
 
     ASSERT(!elem_find(&all_thread_list, &main_thread->all_list_tag));
     list_append(&all_thread_list, &main_thread->all_list_tag);
+}
+
+/* init multi thread environment */
+void ThreadInit()
+{
+    sys_putstr("thread_init..");
+    list_init(&ready_thread_list);
+    list_init(&all_thread_list);
+
+    CreateMainThread();
+    sys_putstr(" done\n");
 }

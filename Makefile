@@ -37,6 +37,11 @@ ${BIN}/kernel/print_asm.o : ${DIR_LIB}/kernel/print_asm.S
 	$(shell mkdir -p ./bin/kernel)
 	nasm -f elf -o $@ $^
 
+${BIN}/switch.o : ${DIR_THREAD}/switch.S
+	@echo "making switch.bin .."
+	$(shell mkdir -p ./bin)
+	nasm -f elf -o $@ $^
+
 ${BIN}/main.o : ${DIR_KERNEL}/main.c
 	@echo "making main.o .."
 	$(shell mkdir -p ./bin)
@@ -121,7 +126,7 @@ ${BIN}/kernel/list.o : ${DIR_LIB}/kernel/list.c
 
 ${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel/print_asm.o ${BIN}/kernel.o \
    ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o ${BIN}/debug.o ${BIN}/string.o ${BIN}/memory.o \
-   ${BIN}/bitmap.o ${BIN}/thread.o ${BIN}/kernel/list.o
+   ${BIN}/bitmap.o ${BIN}/thread.o ${BIN}/kernel/list.o ${BIN}/switch.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o $@ \
 		 -m elf_i386 $^

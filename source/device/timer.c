@@ -5,7 +5,7 @@
 #include "thread.h"
 #include "interrupt.h"
 
-#define IRQ0_FREQUENCY      80
+#define IRQ0_FREQUENCY      50
 #define PULSE_FREQUENCY     1193180
 #define COUNTER0_VALUE      PULSE_FREQUENCY / IRQ0_FREQUENCY
 #define COUNTER0_PORT       0x40

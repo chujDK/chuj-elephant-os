@@ -10,5 +10,6 @@ void InitAll()
     IdtInit();
     TimerInit();
     VmemInit();
+    ThreadInit();
     return;
 }
