@@ -38,6 +38,7 @@ void RegisterHandler(uint8_t int_vector_num, int_handler function)
 
 static void GeneralIntHandler(uint8_t int_vertor_number)
 {
+    DisableInt();
     char str_num[4];
     if (int_vertor_number == 0x27 || int_vertor_number == 0x2F)
     {
@@ -63,6 +64,7 @@ static void GeneralIntHandler(uint8_t int_vertor_number)
     str_num[cnt] = 0;
     sys_putstr(str_num);
     sys_putchar('\n');
+    while(1);
     return;
 }
 

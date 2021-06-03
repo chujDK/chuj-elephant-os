@@ -121,7 +121,7 @@ PCB* ThreadStart(char* name, \
 static void CreateMainThread()
 {
     main_thread = GetCurrentThreadPCB();
-    InitThread(main_thread, "main", 21);
+    InitThread(main_thread, "main", 31);
 
     ASSERT(!elem_find(&all_thread_list, &main_thread->all_list_tag));
     list_append(&all_thread_list, &main_thread->all_list_tag);

@@ -13,8 +13,8 @@ int _start()
     char a[16];
     InitAll();
 
-    ThreadStart("KThreadTest", 21, KThreadTest, "argA ");
-    ThreadStart("KThreadTest", 6, KThreadTest, "argB ");
+    ThreadStart("KThreadTest", 31, KThreadTest, "argA ");
+    ThreadStart("KThreadTest", 8, KThreadTest, "argB ");
 
     EnableInt();
     while(1)

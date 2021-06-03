@@ -12,7 +12,7 @@ switch_to:
     mov [eax],esp           ; store current stack top to self_kernel_stack
 
     mov eax,[esp + 24]      ; get next_thread
-    mov esp,[esp]           ; get next_thread's self_kernel_stack back
+    mov esp,[eax]           ; get next_thread's self_kernel_stack back
     pop ebp
     pop ebx
     pop edi
