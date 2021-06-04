@@ -1,37 +1,5 @@
 # chuj-elephant-OS
-
-My implement of the operating system in the book 《操作系统真象还原》
-
-# where to run 
-
-you can run in
-
-* [bochs](https://bochs.sourceforge.io/)
-* A real IA-32 machine
-
-# making dependence
-
-Only tested under Ubuntu 20.04, with following program installed
-
-* gcc-4.8
-* nasm
-* dd
-* ld
-
-
-# how to run
-
-if using bochs, simply use the following script
-
-```
-./start_bochs.sh
-```
-
-directly running in a real machine is not suggested, so, do not do that!
-
-Makefile is provided, simply type `make` to build the disk image
-
-# finished
+## finished
 
 [MBR](https://www.cjovi.icu/OS/1320.html)
 
@@ -47,4 +15,4 @@ Makefile is provided, simply type `make` to build the disk image
 
 [memory mapping](https://www.cjovi.icu/OS/1349.html)
 
-[thread scheduling](https://www.cjovi.icu/OS/1359.html)
+[thread scheduling and lock](https://www.cjovi.icu/OS/1359.html)
