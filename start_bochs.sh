@@ -1,4 +1,5 @@
 #!/bin/bash
 make
-cd ./disk
+DIR=$(dirname $0)
+cd $DIR/disk
 ./run.sh
