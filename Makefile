@@ -46,4 +46,4 @@ ${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o
 .PHONY : clean
 
 clean :
-	@echo "clean!"
+	rm -rf ./bin
