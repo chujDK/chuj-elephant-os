@@ -13,8 +13,8 @@ int _start()
     sys_putstr("this is kernel!\n");
     InitAll();
 
-    ThreadStart("KThreadTest", 31, KThreadTest, "argA ");
-    ThreadStart("KThreadTest", 8, KThreadTest, "argB ");
+    ThreadStart("KThreadTestA", 31, KThreadTest, "argA ");
+    ThreadStart("KThreadTestB", 8, KThreadTest, "argB ");
 
     EnableInt();
     while(1)

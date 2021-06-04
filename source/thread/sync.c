@@ -3,6 +3,7 @@
 #include "interrupt.h"
 #include "debug.h"
 #include "thread.h"
+#include "print.h"
 
 #define NULL 0
 
@@ -50,7 +51,7 @@ void SemaphoreUp(struct semaphore* psema)
     SetIntStatus(old_int_statu);
 }
 
-void sys_lock_lock(struct lock* plock)
+void sys_lock_lock(struct lock *plock)
 {
     if (plock->holder != GetCurrentThreadPCB())
     {

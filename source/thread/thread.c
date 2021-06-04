@@ -127,6 +127,7 @@ static void CreateMainThread()
     list_append(&all_thread_list, &main_thread->all_list_tag);
 }
 
+/* Block current thread. A thread can only blocked by itself */
 void BlockThread(enum task_status stat)
 {
     ASSERT( stat == TASK_BLOCKD || \
@@ -148,8 +149,10 @@ void UnblockThread(PCB* pthread)
     if (pthread->status != TASK_READY)
     {
         ASSERT(!elem_find(&ready_thread_list, &pthread->general_tag));
-        if (!elem_find(&ready_thread_list, &pthread->general_tag))
+        if (elem_find(&ready_thread_list, &pthread->general_tag))
         {
+            sys_putstr("\ntry to unblock thread, PCB address: 0x");
+            sys_puthex((unsigned int) pthread);
             PANIC("blocked thread in ready_list");
         }
         list_push(&ready_thread_list, &pthread->general_tag);
