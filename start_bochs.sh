@@ -1,6 +1,5 @@
 #!/bin/bash
-cd ./source/boot
-./write_to_disk.sh
-cd ../../
-cd ./disk
+make
+DIR=$(dirname $0)
+cd $DIR/disk
 ./run.sh
