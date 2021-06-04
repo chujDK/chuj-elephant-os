@@ -10,35 +10,43 @@ void ConsoleInit()
     LockInit(&console_lock);
 }
 
-void ConsoleAcquire()
+void ConsoleLockAcquire()
 {
     sys_lock_lock(&console_lock);
 }
 
-void ConsoleRelease()
+void ConsoleLockRelease()
 {
     sys_lock_unlock(&console_lock);
 }
 
 int console_putstr(char *str)
 {
-    ConsoleAcquire();
+    ConsoleLockAcquire();
     int output_num = sys_putstr(str);
-    ConsoleRelease();
+    ConsoleLockRelease();
     return output_num;
 }
 
 void console_putchar(char char_asi)
 {
-    ConsoleAcquire();
+    ConsoleLockAcquire();
     sys_putchar(char_asi);
-    ConsoleRelease();
+    ConsoleLockRelease();
 }
 
 int console_putint(int num)
 {
-    ConsoleAcquire();
+    ConsoleLockAcquire();
     int output_num = sys_putint(num);
-    ConsoleRelease();
+    ConsoleLockRelease();
     return output_num;
+}
+
+int console_puthex(unsigned int num)
+{
+    ConsoleLockAcquire();
+    int output_num = sys_puthex(num);
+    ConsoleLockRelease();
+    return output_num; 
 }
