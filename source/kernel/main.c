@@ -4,7 +4,7 @@ int _start()
     while(1)
     {
         i++;
-        asm volatile(
+        __asm__ volatile(
             "movb $\'K\',%gs:6"
            );
     };
