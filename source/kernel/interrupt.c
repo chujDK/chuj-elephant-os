@@ -9,7 +9,7 @@
 #define PIC_SLAVE_CTRL 0xa0
 #define PIC_SLAVE_DATA 0xa1
 
-#define IDT_DESC_SUM 0x21 /* sum of supported interrupts */
+#define IDT_DESC_SUM 0x30 /* sum of supported interrupts */
 
 #define EFLAGS_IF 0x00000200 /* IF = 1 */
 #define GET_EFLAGS(EFLAGS_VAR) __asm__ volatile ("pushfl; popl %0" : "=g" (EFLAGS_VAR))
@@ -116,7 +116,11 @@ static void PicInit()
     outb(PIC_SLAVE_DATA,0x01); /* ICW4 */
 
     /* only respone to the clock(just for now) */
-    outb(PIC_MASTER_DATA,0xFE);
+//    outb(PIC_MASTER_DATA,0xFE);
+//    outb(PIC_SLAVE_DATA,0xFF);
+
+    /* only respone to the keyborad(just for test) */
+    outb(PIC_MASTER_DATA,0xFD);
     outb(PIC_SLAVE_DATA,0xFF);
 
     sys_putstr(" done\n");

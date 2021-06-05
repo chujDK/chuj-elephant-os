@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "thread.h"
 #include "console.h"
+#include "keyboard.h"
 
 void InitAll()
 {
@@ -14,5 +15,6 @@ void InitAll()
     VmemInit();
     ThreadInit();
     ConsoleInit();
+    KeyboardInit();
     return;
 }

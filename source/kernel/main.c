@@ -13,13 +13,13 @@ int _start()
     sys_putstr("this is kernel!\n");
     InitAll();
 
-    ThreadStart("KThreadTestA", 31, KThreadTest, "argA ");
-    ThreadStart("KThreadTestB", 8, KThreadTest, "argB ");
+//    ThreadStart("KThreadTestA", 31, KThreadTest, "argA ");
+//    ThreadStart("KThreadTestB", 8, KThreadTest, "argB ");
 
     EnableInt();
     while(1)
     {
-        console_putstr("main ");
+//        console_putstr("main ");
     }
     return 0;
 }
