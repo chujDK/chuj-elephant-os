@@ -115,12 +115,8 @@ static void PicInit()
     outb(PIC_SLAVE_DATA,0x02); /* ICW3 */
     outb(PIC_SLAVE_DATA,0x01); /* ICW4 */
 
-    /* only respone to the clock(just for now) */
-//    outb(PIC_MASTER_DATA,0xFE);
-//    outb(PIC_SLAVE_DATA,0xFF);
-
-    /* only respone to the keyborad(just for test) */
-    outb(PIC_MASTER_DATA,0xFD);
+    /* only respone to the keyborad and clock */
+    outb(PIC_MASTER_DATA,0xFC);
     outb(PIC_SLAVE_DATA,0xFF);
 
     sys_putstr(" done\n");

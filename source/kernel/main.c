@@ -5,30 +5,33 @@
 #include "thread.h"
 #include "interrupt.h"
 #include "console.h"
+#include "keyboard.h"
+#include "ioqueue.h"
 
-void KThreadTest(void *arg);
+void KThreadTest();
 
 int _start()
 {
     sys_putstr("this is kernel!\n");
     InitAll();
 
-//    ThreadStart("KThreadTestA", 31, KThreadTest, "argA ");
-//    ThreadStart("KThreadTestB", 8, KThreadTest, "argB ");
+    /* this thread output the input from the keyboard */
+    ThreadStart("KThreadTestA", 31, KThreadTest, "");
 
     EnableInt();
-    while(1)
-    {
-//        console_putstr("main ");
-    }
+    while(1);
     return 0;
 }
 
-void KThreadTest(void *arg)
+void KThreadTest()
 {
-    char *para = (char *) arg;
     while(1)
     {
-        console_putstr(arg);
+        enum int_status old_statu = DisableInt();
+        if (!ioqueueEmpty(&keyboard_IO_buf))
+        {
+            console_putchar(ioqueue_getchar(&keyboard_IO_buf));   
+        }
+        SetIntStatus(old_statu);
     }
 }

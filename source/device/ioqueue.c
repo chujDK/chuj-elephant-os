@@ -16,13 +16,13 @@ static size_t ptr_next_pos(size_t idx)
     return (++idx) % bufsize;
 }
 
-static uint8_t ioqueueFull(struct ioqueue* queue)
+uint8_t ioqueueFull(struct ioqueue* queue)
 {
     ASSERT(GetIntStatus() == INT_OFF);
     return (ptr_next_pos(queue->head) == queue->tail);
 }
 
-static uint8_t ioqueueEmpty(struct ioqueue* queue)
+uint8_t ioqueueEmpty(struct ioqueue* queue)
 {
     ASSERT(GetIntStatus() == INT_OFF);
     return (queue->head == queue->tail); 

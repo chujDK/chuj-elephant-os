@@ -25,4 +25,8 @@ void ioqueue_putchar(struct ioqueue* queue, char byte);
 
 void ioqueueInit(struct ioqueue* queue);
 
+uint8_t ioqueueFull(struct ioqueue* queue);
+
+uint8_t ioqueueEmpty(struct ioqueue* queue);
+
 #endif

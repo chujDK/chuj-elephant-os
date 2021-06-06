@@ -195,8 +195,10 @@ static void IntKeyboardHandler()
 
             if (current_char)
             {
-                sys_putchar(current_char); /* tmp */
-                ioqueue_putchar(&keyboard_IO_buf, current_char);
+                if (!ioqueueFull(&keyboard_IO_buf))
+                {
+                    ioqueue_putchar(&keyboard_IO_buf, current_char);
+                }
             }
 
             if (scan_code == ctrl_l_make || scan_code == ctrl_r_make) 
