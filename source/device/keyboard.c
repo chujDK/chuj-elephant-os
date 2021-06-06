@@ -4,6 +4,7 @@
 #include "io.h"
 #include "global.h"
 #include "stdint.h"
+#include "ioqueue.h"
 
 #define KEYBOARD_BUF_PORT 0x60
 
@@ -34,6 +35,8 @@
 #define ctrl_r_make  	0xe01d
 #define ctrl_r_break 	0xe09d
 #define caps_lock_make 	0x3a
+
+struct ioqueue keyboard_IO_buf;
 
 /* 定义以下变量记录相应键是否按下的状态,
  * ext_scancode用于记录makecode是否以0xe0开头 */
@@ -192,7 +195,8 @@ static void IntKeyboardHandler()
 
             if (current_char)
             {
-                sys_putchar(current_char);
+                sys_putchar(current_char); /* tmp */
+                ioqueue_putchar(&keyboard_IO_buf, current_char);
             }
 
             if (scan_code == ctrl_l_make || scan_code == ctrl_r_make) 
@@ -224,6 +228,7 @@ static void IntKeyboardHandler()
 void KeyboardInit()
 {
     sys_putstr("keyboard_init..");
+    ioqueueInit(&keyboard_IO_buf);
     RegisterHandler(0x21, IntKeyboardHandler);
     sys_putstr(" done\n");
 }

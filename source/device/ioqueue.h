@@ -17,4 +17,12 @@ struct ioqueue
     size_t tail;
 };
 
+/* get one byte from the buf */
+char ioqueue_getchar(struct ioqueue* queue);
+
+/* put one byte to the buf */
+void ioqueue_putchar(struct ioqueue* queue, char byte);
+
+void ioqueueInit(struct ioqueue* queue);
+
 #endif

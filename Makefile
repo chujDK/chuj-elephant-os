@@ -145,10 +145,17 @@ ${BIN}/kernel/list.o : ${DIR_LIB}/kernel/list.c
 		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
 		-c -o $@ $^
 
+${BIN}/ioqueue.o : ${DIR_DEVICE}/ioqueue.c
+	@echo "making ioqueue.o .."
+	$(shell mkdir -p ./bin)
+	gcc ${INCLUDE_PATH} \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^
+
 ${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel/print_asm.o ${BIN}/kernel.o 		\
    ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o ${BIN}/debug.o ${BIN}/string.o ${BIN}/memory.o 		\
    ${BIN}/bitmap.o ${BIN}/thread.o ${BIN}/kernel/list.o ${BIN}/switch.o ${BIN}/sync.o ${BIN}/console.o	\
-   ${BIN}/keyboard.o
+   ${BIN}/keyboard.o ${BIN}/ioqueue.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o $@ \
 		 -m elf_i386 $^
