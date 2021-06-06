@@ -1,6 +1,7 @@
 .bochs-source/
 disk/bochs.out
 disk/hd60M.img
+disk/hd60M.img.lock
 bin/
 
 *.bin
