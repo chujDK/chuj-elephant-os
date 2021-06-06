@@ -2,6 +2,9 @@
 #define __KERNEL_CLOBAL_H
 #include "stdint.h"
 
+#define NULL 0
+#define size_t uint32_t
+
 #define RPL0 0
 #define RPL1 1
 #define RPL2 2
