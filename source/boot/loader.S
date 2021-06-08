@@ -5,7 +5,7 @@ LOADER_STACK_TOP equ LOADER_BASE_ADDR
 
 jmp LoaderStart                         ; 3 bytes
 db 0
-dd 0,0,0                                ; addr align
+dd 0,0,0                                ; addr align to 0x10
 ; offset 0x10
 
 ; set up GOT and descriptor

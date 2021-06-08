@@ -3,6 +3,7 @@ DIR_KERNEL = ./source/kernel
 DIR_DEVICE = ./source/device
 DIR_THREAD = ./source/thread
 DIR_LIB = ./source/lib
+DIR_USERPROG = ./source/userprog
 
 ## boot related
 SRC_BOOT = ${DIR_BOOT}/*.S
@@ -11,7 +12,7 @@ DIR_BOOT_INC = ${DIR_BOOT}/include
 BIN = ./bin
 DIR_DISK = ./disk
 
-INCLUDE_PATH=-I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ -I ${DIR_THREAD}/
+INCLUDE_PATH=-I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ -I ${DIR_THREAD}/ -I ${DIR_USERPROG}/
 
 ${DIR_DISK}/bochsrc.disk : ${BIN}/kernel.bin ${BIN}/mbr.bin ${BIN}/loader.bin
 	@echo "writing to disk .."
@@ -152,10 +153,17 @@ ${BIN}/ioqueue.o : ${DIR_DEVICE}/ioqueue.c
 		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
 		-c -o $@ $^
 
+${BIN}/tss.o : ${DIR_USERPROG}/tss.c
+	@echo "making tss.o .."
+	$(shell mkdir -p ./bin)
+	gcc ${INCLUDE_PATH} \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^
+
 ${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel/print_asm.o ${BIN}/kernel.o 		\
    ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o ${BIN}/debug.o ${BIN}/string.o ${BIN}/memory.o 		\
    ${BIN}/bitmap.o ${BIN}/thread.o ${BIN}/kernel/list.o ${BIN}/switch.o ${BIN}/sync.o ${BIN}/console.o	\
-   ${BIN}/keyboard.o ${BIN}/ioqueue.o
+   ${BIN}/keyboard.o ${BIN}/ioqueue.o ${BIN}/tss.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o $@ \
 		 -m elf_i386 $^
