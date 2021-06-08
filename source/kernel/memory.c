@@ -4,6 +4,8 @@
 #include "bitmap.h"
 #include "string.h"
 #include "debug.h"
+#include "thread.h"
+#include "sync.h"
 
 #define PAGE_SIZE 4096
 
@@ -19,6 +21,7 @@ struct memory_pool
     struct bitmap pool_bitmap;
     size_t physic_addr_start;
     size_t pool_size;
+    struct lock lock;
 };
 
 struct memory_pool kernel_memory_pool, user_memory_pool;
@@ -42,12 +45,25 @@ static void* GetVirtualPage(enum pool_flags pf, size_t request_page_cnt)
         }
         else
         {
+            /* haven't set bitmap, so can directly return NULL */
             return NULL;
         }
     }
     else
     {
-        /* user pool, unused for now */
+        PCB* current_thread = GetCurrentThreadPCB();
+        if(( physic_page_bit_idx = BitmapScan(&current_thread->userprog_vaddr.vaddr_bitmap, request_page_cnt) ) != -1)
+        {
+            while (cnt < request_page_cnt)
+            {
+                BitmapSetBit(&current_thread->userprog_vaddr.vaddr_bitmap, physic_page_bit_idx + cnt++, 1);
+            }
+            Vaddr_start = &current_thread->userprog_vaddr.vaddr_start + physic_page_bit_idx * PAGE_SIZE;
+        }
+        else
+        {
+            return NULL;
+        }
     }
     return (void *)Vaddr_start;
 }
@@ -191,12 +207,70 @@ void* palloc(enum pool_flags pf, size_t page_cnt)
 
 void* kpalloc(size_t page_cnt)
 {
+    sys_lock_lock(&kernel_memory_pool.lock);
     void* vaddr = palloc(KERNEL_POOL, page_cnt);
+    sys_lock_unlock(&kernel_memory_pool.lock);
     if(vaddr != NULL)
     {
         memset(vaddr, 0, page_cnt * PAGE_SIZE);
     }
     return vaddr;
+}
+
+void* upalloc(size_t page_cnt)
+{
+    sys_lock_lock(&user_memory_pool.lock);
+    void* vaddr = palloc(USER_POOL, page_cnt);
+    sys_lock_unlock(&user_memory_pool.lock);
+    if(vaddr != NULL)
+    {
+        memset(vaddr, 0, page_cnt * PAGE_SIZE);
+    }
+    return vaddr;
+}
+
+/* alloc a physic page, and mmapping a virtual page to it */
+void* VirtualAddrMapping(enum pool_flags pf, size_t vaddr)
+{
+    struct memory_pool* memory_pool = pf & KERNEL_POOL ? \
+    &kernel_memory_pool : &user_memory_pool;
+
+    sys_lock_lock(&memory_pool->lock);
+    
+    PCB* curren_thread = GetCurrentThreadPCB();
+    size_t bitmap_idx = -1;
+
+    if(curren_thread->PDE_addr != NULL && pf == USER_POOL)
+    {
+        bitmap_idx = (vaddr - curren_thread->userprog_vaddr.vaddr_start) / PAGE_SIZE;
+        ASSERT(bitmap_idx > 0);
+        BitmapSetBit(&curren_thread->userprog_vaddr.vaddr_bitmap, bitmap_idx, 1);
+    }
+    else if(curren_thread->PDE_addr == NULL && pf == KERNEL_POOL)
+    {
+        bitmap_idx = (vaddr - kernel_vaddr.vaddr_start) / PAGE_SIZE;
+        ASSERT(bitmap_idx > 0);
+        BitmapSetBit(&kernel_vaddr.vaddr_bitmap, bitmap_idx, 1);
+    }
+    else
+    {
+        PANIC("VirtualAddrMapping: kernel alloced userspace or user alloced kernel space");
+    }
+
+    void* physic_page_addr = palloc(pf, 1);
+    if(physic_page_addr == NULL)
+    {
+        return NULL;
+    }
+    PageMapping(vaddr, physic_page_addr);
+    sys_lock_unlock(&memory_pool->lock);
+    return (void*)vaddr;
+}
+
+size_t VirtualAddrToPhysicAddr(size_t vaddr)
+{
+    size_t* pte = GetPTEPointer(vaddr);
+    return (((*pte) & 0xFFFFF000) + (vaddr & 0x00000FFF));
 }
 
 void VmemInit()
@@ -205,6 +279,10 @@ void VmemInit()
     size_t memory_total_bytes = *(size_t *) (0x810);
     /* memory_pool init */
     VmemPoolInit(memory_total_bytes);
+
+    /* lock init */
+    LockInit(&kernel_memory_pool.lock);
+    LockInit(&user_memory_pool.lock);
 
     sys_putstr("done\n");
 }

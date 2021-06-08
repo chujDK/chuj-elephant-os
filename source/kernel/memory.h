@@ -29,5 +29,8 @@ enum pool_flags
 extern struct memory_pool kernel_memory_pool, user_memory_pool;
 void VmemInit();
 void* kpalloc(size_t page_cnt);
+void* upalloc(size_t page_cnt);
+size_t VirtualAddrToPhysicAddr(size_t vaddr);
+void* VirtualAddrMapping(enum pool_flags pf, size_t vaddr);
 
 #endif

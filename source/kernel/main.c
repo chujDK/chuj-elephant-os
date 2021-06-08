@@ -19,6 +19,13 @@ int _start()
     ThreadStart("KThreadTestA", 31, KThreadTest, "");
 
     EnableInt();
+
+    void* mapped_addr = VirtualAddrMapping(KERNEL_POOL, 0xCC00C000);
+    console_putstr("mapping 0x");
+    console_puthex(mapped_addr);
+    console_putstr(" to 0x");
+    console_puthex(VirtualAddrToPhysicAddr(mapped_addr));
+
     while(1);
     return 0;
 }

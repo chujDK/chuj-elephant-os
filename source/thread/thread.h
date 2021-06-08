@@ -3,6 +3,7 @@
 
 #include "stdint.h"
 #include "list.h"
+#include "memory.h"
 
 #define STACK_CANARY 0x32512332
 typedef void thread_func(void*);
@@ -70,6 +71,7 @@ typedef struct task_struct
     struct list_elem all_list_tag;
 
     size_t PDE_addr;
+    struct virtual_addr userprog_vaddr;
     size_t canary;
 }PCB;
 
