@@ -1,2 +1,2 @@
 #!/bin/bash
-bochs -f ./bochsrc.disk
+bochs -q -f ./bochsrc.disk

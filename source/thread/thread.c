@@ -8,6 +8,7 @@
 #include "interrupt.h"
 #include "debug.h"
 #include "switch.h"
+#include "process.h"
 
 #define PAGE_SIZE 4096
 
@@ -54,9 +55,11 @@ void ScheduleThread()
 
     /* get the first READY task, send it to the CPU */
     thread_tag = list_pop(&ready_thread_list);
-    PCB* next_thread = elem2entry(PCB, \
-                                          general_tag, thread_tag);
+    PCB* next_thread = elem2entry(PCB, general_tag, thread_tag);
     next_thread->status = TASK_RUNNING;
+    /* reload PDE and tss->esp0 */
+    ActiveProcess(next_thread);
+    sys_putstr("switch\n"); 
     switch_to(current_thread, next_thread);
 }
 
@@ -77,7 +80,7 @@ void ThreadCreate(PCB* pthread, thread_func function, void* func_arg)
 }
 
 /* init a new thread */
-static void InitThread(PCB* pthread, char* name, int priority)
+void InitThread(PCB* pthread, char* name, int priority)
 {
     memset(pthread, 0, sizeof(*pthread));
     strcpy(pthread->name, name);

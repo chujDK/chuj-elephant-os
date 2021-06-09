@@ -7,30 +7,70 @@
 #include "console.h"
 #include "keyboard.h"
 #include "ioqueue.h"
+#include "process.h"
 
-void KThreadTest();
+void k_thread();
+void KeyboardOutput();
+void user_thread_a();
+void user_thread_b();
+
+int test_var_a = 0, test_var_b = 0;
 
 int _start()
 {
     sys_putstr("this is kernel!\n");
     InitAll();
 
+
     /* this thread output the input from the keyboard */
-    ThreadStart("KThreadTestA", 31, KThreadTest, "");
+    ThreadStart("keyboard_output", 31, KeyboardOutput, "");
+
+    ThreadStart("display_var", 31, k_thread, "");
 
     EnableInt();
 
-    void* mapped_addr = VirtualAddrMapping(KERNEL_POOL, 0xCC00C000);
-    console_putstr("mapping 0x");
-    console_puthex(mapped_addr);
-    console_putstr(" to 0x");
-    console_puthex(VirtualAddrToPhysicAddr(mapped_addr));
+    ExecProcess(user_thread_a, "userthreada");
+    ExecProcess(user_thread_b, "userthreadb");
+
 
     while(1);
     return 0;
 }
 
-void KThreadTest()
+void user_thread_a()
+{
+    while (1)
+    {
+        test_var_a++;
+    }
+}
+
+void user_thread_b()
+{
+    while (1)
+    {
+        test_var_b++;
+    }
+}
+
+void k_thread()
+{
+    while(0)
+    {
+        console_putstr("test_var_a: ");
+        console_putint(test_var_a);
+        console_putchar('\n');
+        console_putstr("test_var_b: ");
+        console_putint(test_var_b);
+        console_putchar('\n');
+    }
+    while (1)
+    {
+    }
+    
+}
+
+void KeyboardOutput()
 {
     while(1)
     {

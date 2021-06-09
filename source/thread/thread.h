@@ -81,5 +81,10 @@ PCB *GetCurrentThreadPCB();
 void ThreadInit();
 void BlockThread();
 void UnblockThread();
+void ThreadCreate(PCB* pthread, thread_func function, void* func_arg);
+void InitThread(PCB* pthread, char* name, int priority);
+
+extern struct list ready_thread_list; 
+extern struct list all_thread_list;
 
 #endif

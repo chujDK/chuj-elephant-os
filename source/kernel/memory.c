@@ -58,7 +58,7 @@ static void* GetVirtualPage(enum pool_flags pf, size_t request_page_cnt)
             {
                 BitmapSetBit(&current_thread->userprog_vaddr.vaddr_bitmap, physic_page_bit_idx + cnt++, 1);
             }
-            Vaddr_start = &current_thread->userprog_vaddr.vaddr_start + physic_page_bit_idx * PAGE_SIZE;
+            Vaddr_start = (size_t)&current_thread->userprog_vaddr.vaddr_start + physic_page_bit_idx * PAGE_SIZE;
         }
         else
         {
@@ -120,8 +120,8 @@ static void PageMapping(void* v_addr, void* physic_page_addr)
     else
     {
         size_t pte_physic_addr = (size_t)(GetOnePhysicPage(&kernel_memory_pool));
-        memset((void*)pte_physic_addr, 0, PAGE_SIZE); /* init the PTE(means nothing mapped) */
-        *(size_t*)pde_addr = (pte_physic_addr | PAGE_P_1 | PAGE_US_U | PAGE_RW_RW);
+        *(size_t*)pde_addr = (pte_physic_addr | PAGE_P_1 | PAGE_US_U | PAGE_RW_RW); /* setup mapping first */
+        memset((void*)((size_t)pte_addr & 0xFFFFF000), 0, PAGE_SIZE); /* init the PTE(means nothing mapped) */
         *(size_t*)pte_addr = ((size_t)physic_page_addr | PAGE_P_1 | PAGE_US_U | PAGE_RW_RW);
     }
 }
@@ -205,6 +205,7 @@ void* palloc(enum pool_flags pf, size_t page_cnt)
     return vaddr_start;
 }
 
+/* return a virtual page that mapped to a kernel page */
 void* kpalloc(size_t page_cnt)
 {
     sys_lock_lock(&kernel_memory_pool.lock);
@@ -257,12 +258,12 @@ void* VirtualAddrMapping(enum pool_flags pf, size_t vaddr)
         PANIC("VirtualAddrMapping: kernel alloced userspace or user alloced kernel space");
     }
 
-    void* physic_page_addr = palloc(pf, 1);
+    void* physic_page_addr = GetOnePhysicPage(memory_pool);
     if(physic_page_addr == NULL)
     {
         return NULL;
     }
-    PageMapping(vaddr, physic_page_addr);
+    PageMapping((void*)vaddr, physic_page_addr);
     sys_lock_unlock(&memory_pool->lock);
     return (void*)vaddr;
 }

@@ -67,11 +67,11 @@ void TssInit()
 
     /* code DESC, dpl = 3 */
     SetUpGDTDesc((struct gdt_desc*) (0xC0000638),\
-    (size_t *) 0, tss_size - 1, GDT_CODE_ATTR_LOW_DPL3, GDT_ATTR_HIGH);
+    (size_t *) 0, 0xFFFFF, GDT_CODE_ATTR_LOW_DPL3, GDT_ATTR_HIGH);
 
     /* data, stack DESC, dpl = 3 */
     SetUpGDTDesc((struct gdt_desc*) (0xC0000640),\
-    (size_t *) 0, tss_size - 1, GDT_DATA_ATTR_LOW_DPL3, GDT_ATTR_HIGH);
+    (size_t *) 0, 0xFFFFF, GDT_DATA_ATTR_LOW_DPL3, GDT_ATTR_HIGH);
 
     uint64_t gdt_operand = \
     ((8 * 7 - 1) | ((uint64_t)((uint32_t)0xC0000610 << 16)));
