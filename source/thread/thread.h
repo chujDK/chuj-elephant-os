@@ -21,10 +21,6 @@ enum task_status
 struct INT_stack
 {
     size_t int_vertor_num;
-    uint16_t gs, __gsh;
-    uint16_t fs, __fsh;
-    uint16_t es, __esh;
-    uint16_t ds, __dsh;
     uint32_t edi;
     uint32_t esi;
     uint32_t ebp;
@@ -33,6 +29,11 @@ struct INT_stack
     uint32_t edx;
     uint32_t ecx;
     uint32_t eax;
+
+    uint16_t gs, __gsh;
+    uint16_t fs, __fsh;
+    uint16_t es, __esh;
+    uint16_t ds, __dsh;
 
     uint32_t err_code;
     uint32_t eip;

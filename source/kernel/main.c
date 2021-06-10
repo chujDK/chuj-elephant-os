@@ -55,7 +55,7 @@ void user_thread_b()
 
 void k_thread()
 {
-    while(0)
+    while(1)
     {
         console_putstr("test_var_a: ");
         console_putint(test_var_a);
@@ -64,10 +64,6 @@ void k_thread()
         console_putint(test_var_b);
         console_putchar('\n');
     }
-    while (1)
-    {
-    }
-    
 }
 
 void KeyboardOutput()

@@ -59,7 +59,6 @@ void ScheduleThread()
     next_thread->status = TASK_RUNNING;
     /* reload PDE and tss->esp0 */
     ActiveProcess(next_thread);
-    sys_putstr("switch\n"); 
     switch_to(current_thread, next_thread);
 }
 
