@@ -52,3 +52,5 @@ Makefile is provided, simply type `make` to build the disk image
 [keyboard IO with buf](https://www.cjovi.icu/OS/1371.html)
 
 [user process](https://www.cjovi.icu/OS/1374.html)
+
+[syscall framework](https://www.cjovi.icu/OS/1402.html)
