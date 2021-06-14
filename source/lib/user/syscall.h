@@ -6,9 +6,11 @@
 
 enum SYSCALL_NR
 {
-	SYS_GETPID
+	SYS_GETPID,
+	SYS_WRITE
 };
 
 size_t getpid();
+size_t write(char* str);
 
 #endif
