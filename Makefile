@@ -12,7 +12,7 @@ DIR_BOOT_INC = ${DIR_BOOT}/include
 BIN = ./bin
 DIR_DISK = ./disk
 
-INCLUDE_PATH=-I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ -I ${DIR_THREAD}/ -I ${DIR_USERPROG}/
+INCLUDE_PATH=-I ${DIR_LIB}/kernel/ -I ${DIR_LIB}/ -I ${DIR_KERNEL}/ -I ${DIR_DEVICE}/ -I ${DIR_THREAD}/ -I ${DIR_USERPROG}/ -I ${DIR_LIB}/user/
 
 ${DIR_DISK}/bochsrc.disk : ${BIN}/kernel.bin ${BIN}/mbr.bin ${BIN}/loader.bin
 	@echo "writing to disk .."
@@ -167,10 +167,25 @@ ${BIN}/process.o : ${DIR_USERPROG}/process.c
 		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
 		-c -o $@ $^
 
+${BIN}/kernel/syscall.o : ${DIR_LIB}/user/syscall.c
+	@echo "making syscall.o .."
+	$(shell mkdir -p ./bin)
+	gcc ${INCLUDE_PATH} \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^ 
+
+${BIN}/kernel/syscall-init.o : ${DIR_LIB}/user/syscall-init.c
+	@echo "making syscall.o .."
+	$(shell mkdir -p ./bin)
+	gcc ${INCLUDE_PATH} \
+		-m32 -fno-asynchronous-unwind-tables -std=c99 -fno-builtin -fno-stack-protector \
+		-c -o $@ $^ 
+
 ${BIN}/kernel.bin : ${BIN}/main.o ${BIN}/kernel/print.o ${BIN}/kernel/print_asm.o ${BIN}/kernel.o 		\
    ${BIN}/interrupt.o ${BIN}/init.o ${BIN}/timer.o ${BIN}/debug.o ${BIN}/string.o ${BIN}/memory.o 		\
    ${BIN}/bitmap.o ${BIN}/thread.o ${BIN}/kernel/list.o ${BIN}/switch.o ${BIN}/sync.o ${BIN}/console.o	\
-   ${BIN}/keyboard.o ${BIN}/ioqueue.o ${BIN}/tss.o ${BIN}/process.o
+   ${BIN}/keyboard.o ${BIN}/ioqueue.o ${BIN}/tss.o ${BIN}/process.o ${BIN}/kernel/syscall-init.o			\
+   ${BIN}/kernel/syscall.o
 	@echo "making kernel.bin .."
 	ld -Ttext 0xC0001500 -e _start -o $@ \
 		 -m elf_i386 $^

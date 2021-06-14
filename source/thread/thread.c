@@ -9,8 +9,11 @@
 #include "debug.h"
 #include "switch.h"
 #include "process.h"
+#include "sync.h"
 
 #define PAGE_SIZE 4096
+
+struct lock pid_lock;
 
 PCB *main_thread;
 struct list ready_thread_list; 
@@ -30,6 +33,15 @@ static void KernelThread(thread_func* function, void* func_arg)
 {
     EnableInt();
     function(func_arg);
+}
+
+static pid_t AllocatePid()
+{
+    static pid_t next_pid = 0;
+    sys_lock_lock(&pid_lock);
+    next_pid++;
+    sys_lock_unlock(&pid_lock);
+    return next_pid;
 }
 
 void ScheduleThread()
@@ -82,6 +94,7 @@ void ThreadCreate(PCB* pthread, thread_func function, void* func_arg)
 void InitThread(PCB* pthread, char* name, int priority)
 {
     memset(pthread, 0, sizeof(*pthread));
+    pthread->pid = AllocatePid();
     strcpy(pthread->name, name);
 
     if (pthread == main_thread)
@@ -169,6 +182,7 @@ void ThreadInit()
     sys_putstr("thread_init..");
     list_init(&ready_thread_list);
     list_init(&all_thread_list);
+    LockInit(&pid_lock); 
 
     CreateMainThread();
     sys_putstr(" done\n");

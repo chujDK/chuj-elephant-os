@@ -3,16 +3,19 @@
 #include "stdint.h"
 #include "global.h"
 #include "io.h"
+#include "debug.h"
 
 #define PIC_MASTER_CTRL 0x20
 #define PIC_MASTER_DATA 0x21
 #define PIC_SLAVE_CTRL 0xa0
 #define PIC_SLAVE_DATA 0xa1
 
-#define IDT_DESC_SUM 0x30 /* sum of supported interrupts */
+#define IDT_DESC_SUM 0x81 /* sum of supported interrupts */
 
 #define EFLAGS_IF 0x00000200 /* IF = 1 */
 #define GET_EFLAGS(EFLAGS_VAR) __asm__ volatile ("pushfl; popl %0" : "=g" (EFLAGS_VAR))
+
+extern size_t syscall_handler();
 
 /* interrupt gate descriptor */
 struct INT_gate_desc
@@ -129,6 +132,10 @@ static void IdtDescInit()
     {
         MakeIdtDesc(&IDT[i], IDT_DESC_ATTRIBUTE_DPL0, interrupt_entry_table[i]);
     }
+
+    ASSERT(IDT_DESC_SUM > 0x80);
+    /* syscall support */
+    MakeIdtDesc(&IDT[0x80], IDT_DESC_ATTRIBUTE_DPL3, syscall_handler);
     sys_putstr(" done\n");
 }
 

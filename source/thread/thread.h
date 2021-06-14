@@ -7,6 +7,7 @@
 
 #define STACK_CANARY 0x32512332
 typedef void thread_func(void*);
+typedef uint16_t pid_t;
 
 enum task_status
 {
@@ -61,6 +62,7 @@ struct thread_stack
 typedef struct task_struct
 {
     uint32_t *self_kernel_stack;
+    pid_t pid;
     enum task_status status;
     uint8_t priority; /* how many ticks the thread running per round */
     char name[16];

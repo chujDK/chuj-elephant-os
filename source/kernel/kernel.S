@@ -97,3 +97,28 @@ VECTOR 0x2C,NONE_ERROR_CODE
 VECTOR 0x2D,NONE_ERROR_CODE
 VECTOR 0x2E,NONE_ERROR_CODE
 VECTOR 0x2F,NONE_ERROR_CODE
+
+; int 0x80
+[bits 32]
+extern syscall_table
+section .text
+global syscall_handler
+syscall_handler:
+    push 0  ; syscall has no errcode, thus push 0
+
+    push ds
+    push es
+    push fs
+    push gs
+    pushad  ; save the context
+
+    push 0x80 ; push the INT number (as IntExit poped this)
+
+    push edx
+    push ecx
+    push ebx
+    call [syscall_table + eax * 4]
+    add esp, 12
+    mov [esp + 8 * 4], eax  ; update the eax in the backup
+                            ; so eax can be the ret val
+    jmp IntExit
