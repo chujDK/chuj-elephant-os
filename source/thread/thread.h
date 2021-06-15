@@ -75,6 +75,7 @@ typedef struct task_struct
 
     size_t PDE_addr;
     struct virtual_addr userprog_vaddr;
+    struct arena_desc user_arena_descs[ARENA_SUM];
     size_t canary;
 }PCB;
 

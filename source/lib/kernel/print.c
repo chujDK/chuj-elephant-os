@@ -33,6 +33,11 @@ int sys_putint(int num)
 
 int sys_puthex(unsigned int num)
 {
+    if (num == 0)
+    {
+        sys_putchar('0');
+        return 1;
+    }
     char str_num[12];
     int cnt = 0;
     while(num)

@@ -2,6 +2,7 @@
 #define __KERNEL_MEMORY_H
 #include "stdint.h"
 #include "bitmap.h"
+#include "list.h"
 
 /* manage virtual addr mapping */
 struct virtual_addr
@@ -14,6 +15,31 @@ enum pool_flags
 {
     KERNEL_POOL = 1,
     USER_POOL = 2
+};
+
+/* memory alloc */
+#define ARENA_SUM 7
+struct memory_block
+{
+    struct list_elem free_elem;
+};
+
+struct arena_desc
+{
+    size_t block_size;
+    size_t memory_blocks_sum;
+    struct list free_list;
+};
+
+struct arena
+{
+    struct arena_desc* desc;
+    /*
+     * large_request == 1 => cnt = num of alloced pages
+     * large_request == 0 => cnt = num of free memory blocks
+     */
+    size_t cnt;
+    int large_request;
 };
 
 /* Present Bit(in or out of physic memory) */
@@ -32,5 +58,12 @@ void* kpalloc(size_t page_cnt);
 void* upalloc(size_t page_cnt);
 size_t VirtualAddrToPhysicAddr(size_t vaddr);
 void* VirtualAddrMapping(enum pool_flags pf, size_t vaddr);
+void ArenaInit(struct arena_desc* desc_array);
+void* sys_malloc(size_t size);
+void pfree(enum pool_flags pf, size_t v_addr, size_t page_cnt);
+void sys_free(void* p);
+
+void* GetVirtualPage(enum pool_flags pf, size_t request_page_cnt);
+void ReturnVirtualPage(enum pool_flags pf, size_t v_addr, size_t page_cnt);
 
 #endif

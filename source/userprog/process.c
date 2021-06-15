@@ -81,7 +81,9 @@ void ExecProcess(void* filename, char* name)
     CreatUserVaddrBitmap(thread);
     ThreadCreate(thread, StartProcess, filename);
     thread->PDE_addr = CreatPDE();
-
+    ArenaInit(thread->user_arena_descs);
+    ASSERT(thread->PDE_addr != NULL);
+    
     enum int_status old_status = GetIntStatus();
 
     ASSERT(!elem_find(&ready_thread_list, &thread->general_tag));

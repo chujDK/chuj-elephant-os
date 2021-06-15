@@ -54,3 +54,5 @@ Makefile is provided, simply type `make` to build the disk image
 [user process](https://www.cjovi.icu/OS/1374.html)
 
 [syscall framework](https://www.cjovi.icu/OS/1402.html)
+
+sys_malloc and sys_free (a very simply memory manager)
