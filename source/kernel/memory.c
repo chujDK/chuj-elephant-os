@@ -65,7 +65,7 @@ void* GetVirtualPage(enum pool_flags pf, size_t request_page_cnt)
             {
                 BitmapSetBit(&current_thread->userprog_vaddr.vaddr_bitmap, virtual_page_bit_idx + cnt++, 1);
             }
-            Vaddr_start = (size_t)&current_thread->userprog_vaddr.vaddr_start + virtual_page_bit_idx * PAGE_SIZE;
+            Vaddr_start = (size_t)current_thread->userprog_vaddr.vaddr_start + virtual_page_bit_idx * PAGE_SIZE;
         }
         else
         {
@@ -131,7 +131,7 @@ static void PageMapping(void* v_addr, void* physic_page_addr)
     
     if ((*(size_t*)pde_addr) & PAGE_P_1) /* this PTE is existed */
     {
-        /* mapping to the same physic_page */
+        /* vpage already mapped */
         ASSERT(!((*(size_t*)pte_addr) & PAGE_P_1));
         if (!((*(size_t*)pte_addr) & PAGE_P_1))
         {
@@ -139,7 +139,7 @@ static void PageMapping(void* v_addr, void* physic_page_addr)
         }
         else
         {
-            PANIC("MAPPING THE SAME PHYSIC PAGE!!");
+            PANIC("VITUARL PAGE ALREADY MAPPED!!");
             while(1);
         }
     }
@@ -256,7 +256,8 @@ void* palloc(enum pool_flags pf, size_t page_cnt)
         page_physic_addr = GetOnePhysicPage(m_pool);
         if (page_physic_addr == NULL)
         {
-            /* free all alloced page to system, we will fill there when we finished free-related function */
+            /* free all alloced page to system */
+            pfree(pf, vaddr_start, (vaddr - vaddr_start) / PAGE_SIZE);
             return NULL;
         }
         PageMapping(vaddr, page_physic_addr);

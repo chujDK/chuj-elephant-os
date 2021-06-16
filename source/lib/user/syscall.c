@@ -63,3 +63,13 @@ size_t write(char* str)
 {
 	return _syscall1(SYS_WRITE, str);
 }
+
+void* malloc(size_t bytes)
+{
+	return _syscall1(SYS_MALLOC, bytes);
+}
+
+void free(void* p)
+{
+	return _syscall1(SYS_FREE, p);
+}

@@ -16,6 +16,8 @@ void user_thread_a();
 void user_thread_b();
 void k_thread_a(void *);
 void k_thread_b(void *);
+void u_prog_a();
+void u_prog_b();
 int test_var_a = 0, test_var_b = 0;
 
 int _start()
@@ -23,56 +25,15 @@ int _start()
     sys_putstr("this is kernel!\n");
     InitAll();
 
-    //    ExecProcess(user_thread_a, "userthreada");
-    //    ExecProcess(user_thread_b, "userthreadb");
+    ExecProcess(u_prog_a, "userthreada");
+    ExecProcess(u_prog_b, "userthreadb");
 
     EnableInt();
 
     /* this thread output the input from the keyboard */
     ThreadStart("keyboard_output", 5, KeyboardOutput, "");
-    ThreadStart("k_thread_a", 31, k_thread_a, "I am thread_a");
-    ThreadStart("k_thread_b", 31, k_thread_b, "I am thread_b ");
-    while (0)
-    {
-        #define TMP_SUM 4
-        void *p[TMP_SUM];
-        for (int i = 0; i < TMP_SUM; i++)
-        {
-            //p[i] = sys_malloc(4000);
-            p[i] = kpalloc(2);
-        }
-        for (int i = 0; i < TMP_SUM; i++)
-        {
-            console_putstr("\n\n#");
-            console_putint(i);
-            console_putstr("virtual: 0x");
-            console_puthex(p[i]);
-            console_putstr(" physic: 0x");
-            console_puthex(VirtualAddrToPhysicAddr(p[i]));
-        }
-        for (int i = 0; i < TMP_SUM; i++)
-        {
-            pfree(KERNEL_POOL, p[i], 2);
-            //sys_free(p[i]);
-        }
-    }
-
-    for (int aaa = 0; aaa < 0; aaa++)
-    {
-        console_putchar('\n');
-        void *p = kpalloc(4);
-        for (int idx = 0; idx < 4; idx++)
-        {
-            console_putstr("V: 0x");
-            console_puthex(p);
-            console_putstr(" P: 0x");
-            console_puthex(VirtualAddrToPhysicAddr(p));
-            console_putchar('\n');
-            p += PAGE_SIZE;
-        }
-        pfree(KERNEL_POOL, p - 4 * PAGE_SIZE, 4);
-    }
-    
+//    ThreadStart("k_thread_a", 31, k_thread_a, "I am thread_a");
+//    ThreadStart("k_thread_b", 31, k_thread_b, "I am thread_b ");
     while (1)
     {
         /* code */
@@ -109,12 +70,9 @@ void k_thread_a(void *arg)
     void *addr6;
     void *addr7;
     console_putstr(" thread_a start\n");
-    int max = 1000;
+    int max = 100;
     while (max-- > 0)
     {
-        console_putstr(arg);
-        console_putint(max);
-        console_putchar('\n');
         int size = 128;
         addr1 = sys_malloc(size);
         size *= 2;
@@ -159,13 +117,10 @@ void k_thread_b(void *arg)
     void *addr7;
     void *addr8;
     void *addr9;
-    int max = 1000;
+    int max = 100;
     console_putstr(" thread_b start\n");
     while (max-- > 0)
     {
-        console_putstr(arg);
-        console_putint(max);
-        console_putchar('\n');
         int size = 9;
         addr1 = sys_malloc(size);
         size *= 2;
@@ -222,6 +177,34 @@ void k_thread(size_t nbytes)
     console_putchar('\n');
     while (1)
         ;
+}
+
+/* 测试用户进程 */
+void u_prog_a(void) {
+   void* addr1 = malloc(256);
+   void* addr2 = malloc(255);
+   void* addr3 = malloc(254);
+
+   int cpu_delay = 100000;
+   while(cpu_delay-- > 0);
+   free(addr1);
+   free(addr2);
+   free(addr3);
+   while(1);
+}
+
+/* 测试用户进程 */
+void u_prog_b(void) {
+   void* addr1 = malloc(256);
+   void* addr2 = malloc(255);
+   void* addr3 = malloc(254);
+
+   int cpu_delay = 100000;
+   while(cpu_delay-- > 0);
+   free(addr1);
+   free(addr2);
+   free(addr3);
+   while(1);
 }
 
 void KeyboardOutput()

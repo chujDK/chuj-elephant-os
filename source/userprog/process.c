@@ -26,7 +26,6 @@ void StartProcess(void* filename)
     process_stack->ds = process_stack->es = process_stack->fs = SELECTOR_U_DATA;
 
     process_stack->eip = function;
-    //process_stack->cs = SELECTOR_U_CODE;
     process_stack->cs = SELECTOR_U_CODE;
     process_stack->eflags = (EFLAGS_IF_1 | EFLAGS_IOPL_0 | EFLAGS_MBS);
     process_stack->esp_at_signal = VirtualAddrMapping(USER_POOL, USER_STACK3_VADDR) + PAGE_SIZE;
