@@ -129,7 +129,6 @@ PCB* ThreadStart(char* name, \
     ASSERT(!elem_find(&all_thread_list, &thread_PCB->all_list_tag));
     list_append(&all_thread_list, &thread_PCB->all_list_tag);
 
-    // __asm__ volatile ("movl %0, %%esp; pop %%ebp; pop %%ebx; pop %%edi; pop %%esi; ret": : "g"(thread_PCB->self_kernel_stack) : "memory");
     return thread_PCB;
 }
 

@@ -118,9 +118,10 @@ static void PicInit()
     outb(PIC_SLAVE_DATA,0x02); /* ICW3 */
     outb(PIC_SLAVE_DATA,0x01); /* ICW4 */
 
-    /* only respone to the keyborad and clock */
-    outb(PIC_MASTER_DATA,0xFC);
-    outb(PIC_SLAVE_DATA,0xFF);
+    /* open clock, keyboard, slave chip int */
+    outb(PIC_MASTER_DATA,0xF8);
+    /* open disk int */
+    outb(PIC_SLAVE_DATA,0xBF);
 
     sys_putstr(" done\n");
 }
