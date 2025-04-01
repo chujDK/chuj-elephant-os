@@ -33,26 +33,26 @@ Makefile is provided, simply type `make` to build the disk image
 
 # finished
 
-[MBR](https://www.cjovi.icu/OS/1320.html)
+[MBR](https://chujdk.github.io/OS/1320.html)
 
-[GDT setup (just a little) and enter Protected Mode](https://www.cjovi.icu/OS/1323.html)
+[GDT setup (just a little) and enter Protected Mode](https://chujdk.github.io/OS/1323.html)
 
-[enter Paging mode](https://www.cjovi.icu/OS/1327.html)
+[enter Paging mode](https://chujdk.github.io/OS/1327.html)
 
-[boot kernel](https://www.cjovi.icu/OS/1330.html)
+[boot kernel](https://chujdk.github.io/OS/1330.html)
 
-[sys_putchar and sys_putstr](https://www.cjovi.icu/OS/1336.html)
+[sys_putchar and sys_putstr](https://chujdk.github.io/OS/1336.html)
 
-[interrupt framework](https://www.cjovi.icu/OS/1339.html)
+[interrupt framework](https://chujdk.github.io/OS/1339.html)
 
-[memory mapping](https://www.cjovi.icu/OS/1349.html)
+[memory mapping](https://chujdk.github.io/OS/1349.html)
 
-[thread scheduling](https://www.cjovi.icu/OS/1359.html)
+[thread scheduling](https://chujdk.github.io/OS/1359.html)
 
-[keyboard IO with buf](https://www.cjovi.icu/OS/1371.html)
+[keyboard IO with buf](https://chujdk.github.io/OS/1371.html)
 
-[user process](https://www.cjovi.icu/OS/1374.html)
+[user process](https://chujdk.github.io/OS/1374.html)
 
-[syscall framework](https://www.cjovi.icu/OS/1402.html)
+[syscall framework](https://chujdk.github.io/OS/1402.html)
 
 sys_malloc and sys_free (a very simply memory manager)
